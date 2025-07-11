@@ -532,3 +532,71 @@ git push -u origin main
 ```
 
 **Can you run this command and tell me what files you see in your `/Users/[username]/Development/Intercom` directory?** This will help me understand what we need to copy to your GitHub repository. 
+
+## 🎯 **Using the Correct Path**
+
+### **Step 1: Navigate to Your GitHub Repository**
+```bash
+cd /Users/kennteoh/Development/larkbot
+```
+
+### **Step 2: Check Current Git Status**
+```bash
+git remote -v
+```
+
+### **Step 3: Add the GitHub Repository as Remote (if needed)**
+```bash
+<code_block_to_apply_changes_from>
+```
+
+### **Step 4: Copy Your Working Project Files**
+```bash
+# Copy all files from your working Intercom project
+cp -r /Users/kennteoh/Development/Intercom/* /Users/kennteoh/Development/larkbot/
+
+# Copy hidden files
+cp /Users/kennteoh/Development/Intercom/.env /Users/kennteoh/Development/larkbot/
+cp /Users/kennteoh/Development/Intercom/.gitignore /Users/kennteoh/Development/larkbot/
+```
+
+### **Step 5: Check Files Are Copied**
+```bash
+ls -la
+```
+
+### **Step 6: Commit and Push**
+```bash
+git add .
+git commit -m "Complete Intercom-Lark bot setup with confirmed credentials"
+git push -u origin main
+```
+
+## 🚀 **Run These Commands:**
+
+**Start with these:**
+```bash
+cd /Users/kennteoh/Development/larkbot
+git remote -v
+```
+
+**Then add the remote if it's not there:**
+```bash
+git remote add origin https://github.com/kennteohstorehub/larkbot.git
+```
+
+**Copy your project files:**
+```bash
+cp -r /Users/kennteoh/Development/Intercom/* /Users/kennteoh/Development/larkbot/
+cp /Users/kennteoh/Development/Intercom/.env /Users/kennteoh/Development/larkbot/
+cp /Users/kennteoh/Development/Intercom/.gitignore /Users/kennteoh/Development/larkbot/
+```
+
+**Finally, push to GitHub:**
+```bash
+git add .
+git commit -m "Complete bot setup"
+git push -u origin main
+```
+
+**Try the first command and let me know what `git remote -v` shows!** 
