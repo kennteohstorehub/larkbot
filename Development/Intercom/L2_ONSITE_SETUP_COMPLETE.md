@@ -114,7 +114,7 @@ Site inspection required for new merchant setup...
 ### **Required Environment Variables:**
 ```env
 # Intercom Configuration
-INTERCOM_TOKEN=dG9rOmVlMTEwNzY0XzRiNjlfNGRjZV84ZjdmXzVjNzI0M2NiYzliMzoxOjA=
+INTERCOM_TOKEN=your_intercom_token_here
 INTERCOM_APP_ID=v2axofpf
 
 # Lark Configuration
