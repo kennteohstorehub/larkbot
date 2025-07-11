@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const chatbotService = require('../services/chatbot');
+const l2OnsiteMonitor = require('../services/l2-onsite-monitor');
 const logger = require('../utils/logger');
 const crypto = require('crypto');
 
@@ -202,6 +203,20 @@ router.post('/intercom', async (req, res) => {
     const { type, data } = req.body;
     
     logger.info('📧 Received Intercom webhook', { type, ticketId: data?.item?.id });
+
+    // First, check if this is an L2 onsite support ticket
+    const conversation = data?.item;
+    if (conversation) {
+      // Process through L2 onsite monitor
+      const processed = await l2OnsiteMonitor.processWebhook(req.body);
+      
+      if (processed) {
+        logger.info('✅ L2 onsite ticket processed successfully', { 
+          ticketId: conversation.id,
+          webhookType: type 
+        });
+      }
+    }
 
     // Handle different Intercom event types
     switch (type) {
@@ -415,24 +430,6 @@ function formatTicketUpdateMessage(ticket, eventType, metadata = {}) {
   message += `**Created:** ${new Date(ticket.created_at * 1000).toLocaleString()}\n`;
   message += `**Updated:** ${new Date(ticket.updated_at * 1000).toLocaleString()}\n`;
   
-  // Add all notes/comments if available
-  if (ticket.conversation_parts && ticket.conversation_parts.conversation_parts) {
-    message += `\n**💬 Recent Activity:**\n`;
-    
-    const parts = ticket.conversation_parts.conversation_parts
-      .slice(-3) // Get last 3 activities
-      .reverse(); // Show newest first
-    
-    parts.forEach((part, index) => {
-      const author = part.author?.name || 'Unknown';
-      const body = part.body ? part.body.substring(0, 200) : 'No content';
-      const timestamp = new Date(part.created_at * 1000).toLocaleString();
-      
-      message += `\n**${author}** (${timestamp}):\n`;
-      message += `${body}${body.length > 200 ? '...' : ''}\n`;
-    });
-  }
-  
   message += `\n[View in Intercom](https://app.intercom.io/a/apps/${process.env.INTERCOM_APP_ID}/inbox/conversation/${ticket.id})`;
   
   return message;
@@ -500,4 +497,4 @@ router.post('/lark/test-message', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -448,3 +448,257 @@ curl http://localhost:3001/api/test-connection
 5. ✅ **Make it ready for deployment**
 
 **Start with the first command block and let me know when you're ready for the next one!** 
+
+## 🔍 **Current Situation:**
+
+- **Your working project**: `/Users/[username]/Development/Intercom` (with all the files we've been working on)
+- **Your GitHub repository**: `/Users/[username]/larkbot` (empty except for README)
+
+## 🔄 **Solution: Copy Your Working Project to GitHub Repository**
+
+### **Step 1: Navigate to Your Working Project**
+```bash
+cd /Users/$(whoami)/Development/Intercom
+```
+
+### **Step 2: Check What Files You Have**
+```bash
+# List all files in your working project
+ls -la
+
+# Check if you have the key files we've been working on
+ls -la src/
+cat package.json
+cat .env
+```
+
+### **Step 3: Copy Your Project to the GitHub Repository**
+```bash
+# Copy all files from your working project to the GitHub repository
+cp -r /Users/$(whoami)/Development/Intercom/* /Users/$(whoami)/larkbot/
+
+# Also copy hidden files (like .env, .gitignore)
+cp /Users/$(whoami)/Development/Intercom/.* /Users/$(whoami)/larkbot/ 2>/dev/null || true
+```
+
+### **Step 4: Navigate to GitHub Repository and Push**
+```bash
+# Go to the GitHub repository
+cd /Users/$(whoami)/larkbot
+
+# Check what files are now there
+ls -la
+
+# Add all files to git
+git add .
+
+# Commit with your working setup
+git commit -m "Add complete Intercom-Lark bot project
+
+✅ Confirmed working Intercom credentials (***REMOVED***)
+✅ Confirmed working Lark credentials (***REMOVED***)
+✅ All source code and documentation
+✅ Environment configuration
+✅ Ready for deployment"
+
+# Push to GitHub
+git push origin main
+```
+
+## 🎯 **Alternative: Initialize Git in Your Working Directory**
+
+If you prefer to use your existing `/Users/[username]/Development/Intercom` as the main repository:
+
+```bash
+# Navigate to your working project
+cd /Users/$(whoami)/Development/Intercom
+
+# Initialize git if not already done
+git init
+
+# Add the GitHub repository as remote
+git remote add origin https://github.com/kennteohstorehub/larkbot.git
+
+# Add, commit, and push
+git add .
+git commit -m "Complete Intercom-Lark bot setup with confirmed credentials"
+git push -u origin main
+```
+
+## 🔍 **First, Let's Check Your Working Project:**
+
+```bash
+<code_block_to_apply_changes_from>
+```
+
+**Can you run this command and tell me what files you see in your `/Users/[username]/Development/Intercom` directory?** This will help me understand what we need to copy to your GitHub repository. 
+
+## 🎯 **Using the Correct Path**
+
+### **Step 1: Navigate to Your GitHub Repository**
+```bash
+cd /Users/kennteoh/Development/larkbot
+```
+
+### **Step 2: Check Current Git Status**
+```bash
+git remote -v
+```
+
+### **Step 3: Add the GitHub Repository as Remote (if needed)**
+```bash
+<code_block_to_apply_changes_from>
+```
+
+### **Step 4: Copy Your Working Project Files**
+```bash
+# Copy all files from your working Intercom project
+cp -r /Users/kennteoh/Development/Intercom/* /Users/kennteoh/Development/larkbot/
+
+# Copy hidden files
+cp /Users/kennteoh/Development/Intercom/.env /Users/kennteoh/Development/larkbot/
+cp /Users/kennteoh/Development/Intercom/.gitignore /Users/kennteoh/Development/larkbot/
+```
+
+### **Step 5: Check Files Are Copied**
+```bash
+ls -la
+```
+
+### **Step 6: Commit and Push**
+```bash
+git add .
+git commit -m "Complete Intercom-Lark bot setup with confirmed credentials"
+git push -u origin main
+```
+
+## 🚀 **Run These Commands:**
+
+**Start with these:**
+```bash
+cd /Users/kennteoh/Development/larkbot
+git remote -v
+```
+
+**Then add the remote if it's not there:**
+```bash
+git remote add origin https://github.com/kennteohstorehub/larkbot.git
+```
+
+**Copy your project files:**
+```bash
+cp -r /Users/kennteoh/Development/Intercom/* /Users/kennteoh/Development/larkbot/
+cp /Users/kennteoh/Development/Intercom/.env /Users/kennteoh/Development/larkbot/
+cp /Users/kennteoh/Development/Intercom/.gitignore /Users/kennteoh/Development/larkbot/
+```
+
+**Finally, push to GitHub:**
+```bash
+git add .
+git commit -m "Complete bot setup"
+git push -u origin main
+```
+
+**Try the first command and let me know what `git remote -v` shows!** 
+
+## 🧪 **Let's Test Your Intercom Connection and Search**
+
+### **Method 1: Test with curl (Direct API)**
+
+```bash
+# Search for conversations with "L2 onsite support" in the content
+curl -X GET "https://api.intercom.io/conversations/search" \
+  -H "Authorization: Bearer ***REMOVED***" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "operator": "AND",
+      "operands": [
+        {
+          "field": "body",
+          "operator": "~",
+          "value": "L2 onsite support"
+        }
+      ]
+    }
+  }'
+```
+
+### **Method 2: Search by Tags (if L2 onsite support is tagged)**
+
+```bash
+# Search for conversations with specific tags
+curl -X GET "https://api.intercom.io/conversations/search" \
+  -H "Authorization: Bearer ***REMOVED***" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "operator": "AND",
+      "operands": [
+        {
+          "field": "tag_list",
+          "operator": "=",
+          "value": "L2 onsite support"
+        }
+      ]
+    }
+  }'
+```
+
+### **Method 3: Search Custom Attributes (if you have them)**
+
+```bash
+# Search for tickets with custom attributes
+curl -X GET "https://api.intercom.io/conversations/search" \
+  -H "Authorization: Bearer ***REMOVED***" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "operator": "AND",
+      "operands": [
+        {
+          "field": "custom_attributes.ticket_type",
+          "operator": "=",
+          "value": "L2 onsite support"
+        }
+      ]
+    }
+  }'
+```
+
+## 🔍 **Alternative: Use Your Application**
+
+If you have your application running:
+
+```bash
+<code_block_to_apply_changes_from>
+```
+
+## 🎯 **What I Can Help You Do:**
+
+1. ✅ **Provide the exact API calls** to search for tickets
+2. ✅ **Help you interpret the results**
+3. ✅ **Build search functionality** into your application
+4. ✅ **Create filters** for specific ticket types
+5. ✅ **Set up notifications** for L2 onsite support tickets
+
+## 📊 **From Your Previous Data:**
+
+I remember seeing in your ticket data:
+- Custom attributes like `"💾 Software Category":"💼BackOffice : Account Setting"`
+- Categories and types in your tickets
+- Rich metadata structure
+
+## 🔍 **Let's Find L2 Onsite Support Tickets:**
+
+**Try the first curl command above and let me know:**
+1. **What results you get**
+2. **If you see any L2 onsite support tickets**
+3. **What the ticket structure looks like**
+
+**Or tell me:** 
+- **How is "L2 onsite support" typically stored?** (as a tag, custom attribute, or in the content?)
+- **Do you want me to help you build a search function** for this specific ticket type? 

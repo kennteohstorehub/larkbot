@@ -1,4 +1,4 @@
-const { Client } = require('intercom-client');
+const axios = require('axios');
 const config = require('../config');
 const logger = require('../utils/logger');
 
@@ -26,8 +26,13 @@ class IntercomService {
         throw new Error('Intercom token is required');
       }
 
-      this.client = new Client({
-        tokenAuth: { token: config.intercom.token }
+      this.client = axios.create({
+        baseURL: 'https://api.intercom.io',
+        headers: {
+          'Authorization': `Bearer ${config.intercom.token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
       });
 
       // Test connection
@@ -49,19 +54,19 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/me');
       
-      const response = await this.client.admins.me();
+      const response = await this.client.get('/me');
       const duration = Date.now() - startTime;
       
-      logger.logApiResponse('Intercom', 'GET', '/me', 200, response);
+      logger.logApiResponse('Intercom', 'GET', '/me', response.status, response.data);
       logger.logPerformance('Intercom.testConnection', duration);
       
       logger.info('Intercom connection successful', {
-        adminName: response.name,
-        adminEmail: response.email,
+        adminName: response.data.name,
+        adminEmail: response.data.email,
         appId: config.intercom.appId
       });
       
-      return response;
+      return response.data;
     } catch (error) {
       logger.logError('IntercomService.testConnection', error);
       throw error;
@@ -129,23 +134,23 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/conversations', params);
 
-      const response = await this.client.conversations.list(params);
+      const response = await this.client.get('/conversations', { params });
       const duration = Date.now() - startTime;
 
-      logger.logApiResponse('Intercom', 'GET', '/conversations', 200, response);
+      logger.logApiResponse('Intercom', 'GET', '/conversations', response.status, response.data);
       logger.logPerformance('Intercom.getConversations', duration, {
         page: params.page,
         perPage: params.per_page,
-        totalCount: response.total_count
+        totalCount: response.data.total_count
       });
 
       this.updateRateLimitInfo(response);
 
       return {
-        conversations: response.conversations || [],
-        totalCount: response.total_count || 0,
-        pages: response.pages || {},
-        hasMore: response.pages?.next !== null
+        conversations: response.data.conversations || [],
+        totalCount: response.data.total_count || 0,
+        pages: response.data.pages || {},
+        hasMore: response.data.pages?.next !== null
       };
     } catch (error) {
       logger.logError('IntercomService.getConversations', error, { params });
@@ -166,13 +171,13 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', `/conversations/${conversationId}`);
 
-      const response = await this.client.conversations.find({ id: conversationId });
+      const response = await this.client.get(`/conversations/${conversationId}`);
       const duration = Date.now() - startTime;
 
-      logger.logApiResponse('Intercom', 'GET', `/conversations/${conversationId}`, 200, response);
+      logger.logApiResponse('Intercom', 'GET', `/conversations/${conversationId}`, response.status, response.data);
       logger.logPerformance('Intercom.getConversation', duration, { conversationId });
 
-      return response;
+      return response.data;
     } catch (error) {
       logger.logError('IntercomService.getConversation', error, { conversationId });
       throw error;
@@ -199,23 +204,23 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/tickets', params);
 
-      const response = await this.client.tickets.list(params);
+      const response = await this.client.get('/tickets', { params });
       const duration = Date.now() - startTime;
 
-      logger.logApiResponse('Intercom', 'GET', '/tickets', 200, response);
+      logger.logApiResponse('Intercom', 'GET', '/tickets', response.status, response.data);
       logger.logPerformance('Intercom.getTickets', duration, {
         page: params.page,
         perPage: params.per_page,
-        totalCount: response.total_count
+        totalCount: response.data.total_count
       });
 
       this.updateRateLimitInfo(response);
 
       return {
-        tickets: response.tickets || [],
-        totalCount: response.total_count || 0,
-        pages: response.pages || {},
-        hasMore: response.pages?.next !== null
+        tickets: response.data.tickets || [],
+        totalCount: response.data.total_count || 0,
+        pages: response.data.pages || {},
+        hasMore: response.data.pages?.next !== null
       };
     } catch (error) {
       logger.logError('IntercomService.getTickets', error, { params });
@@ -243,23 +248,23 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/contacts', params);
 
-      const response = await this.client.contacts.list(params);
+      const response = await this.client.get('/contacts', { params });
       const duration = Date.now() - startTime;
 
-      logger.logApiResponse('Intercom', 'GET', '/contacts', 200, response);
+      logger.logApiResponse('Intercom', 'GET', '/contacts', response.status, response.data);
       logger.logPerformance('Intercom.getContacts', duration, {
         page: params.page,
         perPage: params.per_page,
-        totalCount: response.total_count
+        totalCount: response.data.total_count
       });
 
       this.updateRateLimitInfo(response);
 
       return {
-        contacts: response.contacts || [],
-        totalCount: response.total_count || 0,
-        pages: response.pages || {},
-        hasMore: response.pages?.next !== null
+        contacts: response.data.contacts || [],
+        totalCount: response.data.total_count || 0,
+        pages: response.data.pages || {},
+        hasMore: response.data.pages?.next !== null
       };
     } catch (error) {
       logger.logError('IntercomService.getContacts', error, { params });
@@ -326,6 +331,51 @@ class IntercomService {
     });
 
     return allConversations.slice(0, limit);
+  }
+
+  /**
+   * Search conversations with advanced query capabilities
+   * @param {Object} searchQuery - Search query object
+   * @returns {Promise<Object>} Search results
+   */
+  async searchConversations(searchQuery) {
+    this.ensureInitialized();
+    await this.checkRateLimit();
+
+    try {
+      const startTime = Date.now();
+      logger.logApiRequest('Intercom', 'POST', '/conversations/search', searchQuery);
+
+      const response = await this.client.post('/conversations/search', searchQuery);
+      const duration = Date.now() - startTime;
+
+      logger.logApiResponse('Intercom', 'POST', '/conversations/search', response.status, response.data);
+      logger.logPerformance('Intercom.searchConversations', duration, {
+        totalCount: response.data.total_count || 0,
+        queryOperands: searchQuery.query?.operands?.length || 0
+      });
+
+      this.updateRateLimitInfo(response);
+
+      return {
+        conversations: response.data.conversations || [],
+        totalCount: response.data.total_count || 0,
+        pages: response.data.pages || {},
+        hasMore: response.data.pages?.next !== null
+      };
+    } catch (error) {
+      // Log the full error response for debugging
+      if (error.response) {
+        logger.error('Intercom API Error', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          searchQuery
+        });
+      }
+      logger.logError('IntercomService.searchConversations', error, { searchQuery });
+      throw error;
+    }
   }
 
   /**
