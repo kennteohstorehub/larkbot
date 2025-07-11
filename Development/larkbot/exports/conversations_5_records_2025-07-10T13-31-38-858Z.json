@@ -1,0 +1,244 @@
+{
+  "metadata": {
+    "exportedAt": "2025-07-10T13:31:38.858Z",
+    "totalRecords": 5,
+    "format": "json",
+    "source": "Intercom",
+    "dataType": "conversations",
+    "extractedAt": "2025-07-10T13:31:38.858Z"
+  },
+  "data": [
+    {
+      "id": "mock_conv_1_1",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-1",
+      "state": "closed",
+      "open": false,
+      "read": true,
+      "priority": "high",
+      "created_at": 1751889437360,
+      "updated_at": 1752131387224,
+      "waiting_since": 1752123380722,
+      "assignee": {
+        "id": "mock_admin_1",
+        "name": "Bob Johnson",
+        "email": "agent3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_1",
+            "name": "Customer 1",
+            "email": "customer1@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 3
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 1",
+          "email": "customer1@example.com"
+        }
+      }
+    },
+    {
+      "id": "mock_conv_1_2",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-2",
+      "state": "snoozed",
+      "open": false,
+      "read": true,
+      "priority": "normal",
+      "created_at": 1751650196120,
+      "updated_at": 1752077428333,
+      "waiting_since": 1752120426276,
+      "assignee": {
+        "id": "mock_admin_2",
+        "name": "Alice Smith",
+        "email": "agent2@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_2",
+            "name": "Customer 2",
+            "email": "customer2@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 4
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 2",
+          "email": "customer2@example.com"
+        }
+      }
+    },
+    {
+      "id": "mock_conv_1_3",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-3",
+      "state": "snoozed",
+      "open": false,
+      "read": false,
+      "priority": "low",
+      "created_at": 1751606356837,
+      "updated_at": 1752075066404,
+      "waiting_since": 1752136524657,
+      "assignee": {
+        "id": "mock_admin_1",
+        "name": "Carol Davis",
+        "email": "agent5@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_3",
+            "name": "Customer 3",
+            "email": "customer3@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 6
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          },
+          {
+            "name": "technical"
+          }
+        ]
+      },
+      "source": {
+        "type": "phone",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 3",
+          "email": "customer3@example.com"
+        }
+      }
+    },
+    {
+      "id": "mock_conv_1_4",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-4",
+      "state": "snoozed",
+      "open": false,
+      "read": true,
+      "priority": "normal",
+      "created_at": 1751706699100,
+      "updated_at": 1752101279050,
+      "waiting_since": 1752121618254,
+      "assignee": {
+        "id": "mock_admin_4",
+        "name": "Alice Smith",
+        "email": "agent5@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_4",
+            "name": "Customer 4",
+            "email": "customer4@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 13
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 4",
+          "email": "customer4@example.com"
+        }
+      }
+    },
+    {
+      "id": "mock_conv_1_5",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-5",
+      "state": "closed",
+      "open": true,
+      "read": true,
+      "priority": "high",
+      "created_at": 1752017275919,
+      "updated_at": 1752149655310,
+      "waiting_since": 1752114653830,
+      "assignee": {
+        "id": "mock_admin_5",
+        "name": "Alice Smith",
+        "email": "agent3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_5",
+            "name": "Customer 5",
+            "email": "customer5@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 8
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          }
+        ]
+      },
+      "source": {
+        "type": "chat",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 5",
+          "email": "customer5@example.com"
+        }
+      }
+    }
+  ]
+}

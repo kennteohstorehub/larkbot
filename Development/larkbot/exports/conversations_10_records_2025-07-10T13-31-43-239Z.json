@@ -1,0 +1,704 @@
+{
+  "metadata": {
+    "exportedAt": "2025-07-10T13:31:43.239Z",
+    "totalRecords": 10,
+    "format": "json",
+    "source": "Intercom",
+    "dataType": "conversations",
+    "extractedAt": "2025-07-10T13:31:43.239Z"
+  },
+  "data": [
+    {
+      "id": "mock_conv_1_1",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-1",
+      "state": "open",
+      "open": false,
+      "read": true,
+      "priority": "high",
+      "created_at": 1751744939875,
+      "updated_at": 1752128413316,
+      "waiting_since": 1752135800824,
+      "assignee": {
+        "id": "mock_admin_4",
+        "name": "Bob Johnson",
+        "email": "agent4@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_1",
+            "name": "Customer 1",
+            "email": "customer1@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 2
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          },
+          {
+            "name": "technical"
+          }
+        ]
+      },
+      "source": {
+        "type": "phone",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 1",
+          "email": "customer1@example.com"
+        }
+      },
+      "responseTime": 9,
+      "sentiment": "neutral",
+      "complexity": "low",
+      "customerType": "new",
+      "urgencyScore": 8,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 71,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "high",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_2",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-2",
+      "state": "closed",
+      "open": true,
+      "read": true,
+      "priority": "high",
+      "created_at": 1752027404950,
+      "updated_at": 1752095072027,
+      "waiting_since": 1752135971040,
+      "assignee": {
+        "id": "mock_admin_4",
+        "name": "Alice Smith",
+        "email": "agent5@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_2",
+            "name": "Customer 2",
+            "email": "customer2@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 3
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          },
+          {
+            "name": "technical"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 2",
+          "email": "customer2@example.com"
+        }
+      },
+      "responseTime": 7,
+      "sentiment": "neutral",
+      "complexity": "low",
+      "customerType": "vip",
+      "urgencyScore": 4,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 34,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "high",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_3",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-3",
+      "state": "open",
+      "open": false,
+      "read": true,
+      "priority": "normal",
+      "created_at": 1751880354457,
+      "updated_at": 1752069766276,
+      "waiting_since": 1752113228915,
+      "assignee": {
+        "id": "mock_admin_2",
+        "name": "Carol Davis",
+        "email": "agent5@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_3",
+            "name": "Customer 3",
+            "email": "customer3@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 2
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          },
+          {
+            "name": "technical"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 3",
+          "email": "customer3@example.com"
+        }
+      },
+      "responseTime": 20,
+      "sentiment": "negative",
+      "complexity": "low",
+      "customerType": "returning",
+      "urgencyScore": 10,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 1,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "low",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "normal",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_4",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-4",
+      "state": "snoozed",
+      "open": true,
+      "read": true,
+      "priority": "normal",
+      "created_at": 1751634985183,
+      "updated_at": 1752092237641,
+      "waiting_since": 1752114109646,
+      "assignee": {
+        "id": "mock_admin_2",
+        "name": "Alice Smith",
+        "email": "agent1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_4",
+            "name": "Customer 4",
+            "email": "customer4@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 18
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 4",
+          "email": "customer4@example.com"
+        }
+      },
+      "responseTime": 2,
+      "sentiment": "negative",
+      "complexity": "high",
+      "customerType": "vip",
+      "urgencyScore": 5,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 56,
+      "escalationRisk": "medium",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "normal",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_5",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-5",
+      "state": "open",
+      "open": true,
+      "read": false,
+      "priority": "high",
+      "created_at": 1751761898214,
+      "updated_at": 1752102986513,
+      "waiting_since": 1752120127404,
+      "assignee": {
+        "id": "mock_admin_2",
+        "name": "Alice Smith",
+        "email": "agent1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_5",
+            "name": "Customer 5",
+            "email": "customer5@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 7
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          }
+        ]
+      },
+      "source": {
+        "type": "email",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 5",
+          "email": "customer5@example.com"
+        }
+      },
+      "responseTime": 12,
+      "sentiment": "positive",
+      "complexity": "medium",
+      "customerType": "new",
+      "urgencyScore": 1,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 5,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "high",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_6",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-6",
+      "state": "closed",
+      "open": false,
+      "read": true,
+      "priority": "low",
+      "created_at": 1751898722842,
+      "updated_at": 1752124826493,
+      "waiting_since": 1752120626186,
+      "assignee": {
+        "id": "mock_admin_1",
+        "name": "Bob Johnson",
+        "email": "agent3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_6",
+            "name": "Customer 6",
+            "email": "customer6@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 15
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          }
+        ]
+      },
+      "source": {
+        "type": "phone",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 6",
+          "email": "customer6@example.com"
+        }
+      },
+      "responseTime": 15,
+      "sentiment": "negative",
+      "complexity": "high",
+      "customerType": "vip",
+      "urgencyScore": 3,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 72,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "low",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "low",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_7",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-7",
+      "state": "open",
+      "open": true,
+      "read": true,
+      "priority": "high",
+      "created_at": 1751779651925,
+      "updated_at": 1752103001282,
+      "waiting_since": 1752116040495,
+      "assignee": {
+        "id": "mock_admin_1",
+        "name": "David Wilson",
+        "email": "agent1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_7",
+            "name": "Customer 7",
+            "email": "customer7@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 14
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          }
+        ]
+      },
+      "source": {
+        "type": "phone",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 7",
+          "email": "customer7@example.com"
+        }
+      },
+      "responseTime": 2,
+      "sentiment": "positive",
+      "complexity": "high",
+      "customerType": "returning",
+      "urgencyScore": 10,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 37,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "high",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_8",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-8",
+      "state": "snoozed",
+      "open": false,
+      "read": true,
+      "priority": "low",
+      "created_at": 1751743834161,
+      "updated_at": 1752125327287,
+      "waiting_since": 1752118089996,
+      "assignee": {
+        "id": "mock_admin_5",
+        "name": "Carol Davis",
+        "email": "agent3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_8",
+            "name": "Customer 8",
+            "email": "customer8@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 13
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          }
+        ]
+      },
+      "source": {
+        "type": "chat",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 8",
+          "email": "customer8@example.com"
+        }
+      },
+      "responseTime": 21,
+      "sentiment": "negative",
+      "complexity": "high",
+      "customerType": "returning",
+      "urgencyScore": 8,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 37,
+      "escalationRisk": "medium",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "low",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "low",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_9",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-9",
+      "state": "closed",
+      "open": true,
+      "read": true,
+      "priority": "low",
+      "created_at": 1751874533081,
+      "updated_at": 1752117560458,
+      "waiting_since": 1752121319788,
+      "assignee": {
+        "id": "mock_admin_5",
+        "name": "Bob Johnson",
+        "email": "agent1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_9",
+            "name": "Customer 9",
+            "email": "customer9@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 13
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          },
+          {
+            "name": "technical"
+          }
+        ]
+      },
+      "source": {
+        "type": "chat",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 9",
+          "email": "customer9@example.com"
+        }
+      },
+      "responseTime": 19,
+      "sentiment": "positive",
+      "complexity": "high",
+      "customerType": "new",
+      "urgencyScore": 1,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 5,
+      "escalationRisk": "medium",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "low",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_conv_1_10",
+      "type": "conversation",
+      "subject": "Mock Conversation 1-10",
+      "state": "snoozed",
+      "open": true,
+      "read": true,
+      "priority": "high",
+      "created_at": 1751727289747,
+      "updated_at": 1752124079589,
+      "waiting_since": 1752141364692,
+      "assignee": {
+        "id": "mock_admin_5",
+        "name": "David Wilson",
+        "email": "agent4@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_contact_10",
+            "name": "Customer 10",
+            "email": "customer10@example.com"
+          }
+        ]
+      },
+      "conversation_message": {
+        "total_count": 9
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "support"
+          },
+          {
+            "name": "billing"
+          },
+          {
+            "name": "technical"
+          }
+        ]
+      },
+      "source": {
+        "type": "chat",
+        "url": "https://mock.intercom.io",
+        "author": {
+          "name": "Customer 10",
+          "email": "customer10@example.com"
+        }
+      },
+      "responseTime": 9,
+      "sentiment": "neutral",
+      "complexity": "medium",
+      "customerType": "vip",
+      "urgencyScore": 6,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 11,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_conv_1_1",
+        "mock_conv_1_2",
+        "mock_conv_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "suggested_priority": "high",
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    }
+  ]
+}

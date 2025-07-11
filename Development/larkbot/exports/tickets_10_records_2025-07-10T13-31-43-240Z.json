@@ -1,0 +1,539 @@
+{
+  "metadata": {
+    "exportedAt": "2025-07-10T13:31:43.240Z",
+    "totalRecords": 10,
+    "format": "json",
+    "source": "Intercom",
+    "dataType": "tickets",
+    "extractedAt": "2025-07-10T13:31:43.240Z"
+  },
+  "data": [
+    {
+      "id": "mock_ticket_1_1",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-1",
+        "state": "open",
+        "priority": "low",
+        "category": "billing"
+      },
+      "created_at": 1751765140161,
+      "updated_at": 1752075443360,
+      "assignee": {
+        "id": "mock_agent_1",
+        "name": "Support Agent 1",
+        "email": "support3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_1",
+            "name": "Customer 1",
+            "email": "customer1@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": []
+      },
+      "responseTime": 2,
+      "sentiment": "positive",
+      "complexity": "low",
+      "customerType": "trial",
+      "urgencyScore": 6,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 32,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_2",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-2",
+        "state": "open",
+        "priority": "low",
+        "category": "billing"
+      },
+      "created_at": 1751392482659,
+      "updated_at": 1752071116305,
+      "assignee": {
+        "id": "mock_agent_2",
+        "name": "Support Agent 1",
+        "email": "support1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_2",
+            "name": "Customer 2",
+            "email": "customer2@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          },
+          {
+            "name": "follow-up"
+          }
+        ]
+      },
+      "responseTime": 17,
+      "sentiment": "positive",
+      "complexity": "low",
+      "customerType": "vip",
+      "urgencyScore": 5,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 12,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_3",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-3",
+        "state": "open",
+        "priority": "low",
+        "category": "feature_request"
+      },
+      "created_at": 1751889639101,
+      "updated_at": 1752098122894,
+      "assignee": {
+        "id": "mock_agent_3",
+        "name": "Support Agent 2",
+        "email": "support3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_3",
+            "name": "Customer 3",
+            "email": "customer3@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          }
+        ]
+      },
+      "responseTime": 10,
+      "sentiment": "positive",
+      "complexity": "low",
+      "customerType": "returning",
+      "urgencyScore": 10,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 17,
+      "escalationRisk": "medium",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_4",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-4",
+        "state": "resolved",
+        "priority": "normal",
+        "category": "general"
+      },
+      "created_at": 1751062950939,
+      "updated_at": 1752146938333,
+      "assignee": {
+        "id": "mock_agent_3",
+        "name": "Support Agent 2",
+        "email": "support3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_4",
+            "name": "Customer 4",
+            "email": "customer4@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": []
+      },
+      "responseTime": 10,
+      "sentiment": "negative",
+      "complexity": "low",
+      "customerType": "new",
+      "urgencyScore": 8,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 5,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_5",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-5",
+        "state": "open",
+        "priority": "normal",
+        "category": "billing"
+      },
+      "created_at": 1751187490060,
+      "updated_at": 1752142084584,
+      "assignee": {
+        "id": "mock_agent_3",
+        "name": "Support Agent 3",
+        "email": "support3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_5",
+            "name": "Customer 5",
+            "email": "customer5@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          },
+          {
+            "name": "follow-up"
+          }
+        ]
+      },
+      "responseTime": 21,
+      "sentiment": "neutral",
+      "complexity": "low",
+      "customerType": "returning",
+      "urgencyScore": 10,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 30,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "medium",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_6",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-6",
+        "state": "pending",
+        "priority": "low",
+        "category": "billing"
+      },
+      "created_at": 1751108899063,
+      "updated_at": 1752101344226,
+      "assignee": {
+        "id": "mock_agent_3",
+        "name": "Support Agent 3",
+        "email": "support1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_6",
+            "name": "Customer 6",
+            "email": "customer6@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          },
+          {
+            "name": "follow-up"
+          }
+        ]
+      },
+      "responseTime": 14,
+      "sentiment": "negative",
+      "complexity": "low",
+      "customerType": "trial",
+      "urgencyScore": 10,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 34,
+      "escalationRisk": "medium",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_7",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-7",
+        "state": "pending",
+        "priority": "normal",
+        "category": "technical"
+      },
+      "created_at": 1751998740246,
+      "updated_at": 1752069352375,
+      "assignee": {
+        "id": "mock_agent_2",
+        "name": "Support Agent 3",
+        "email": "support1@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_7",
+            "name": "Customer 7",
+            "email": "customer7@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          }
+        ]
+      },
+      "responseTime": 4,
+      "sentiment": "positive",
+      "complexity": "low",
+      "customerType": "new",
+      "urgencyScore": 1,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 23,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "low",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_8",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-8",
+        "state": "open",
+        "priority": "low",
+        "category": "technical"
+      },
+      "created_at": 1751925239188,
+      "updated_at": 1752105607806,
+      "assignee": {
+        "id": "mock_agent_2",
+        "name": "Support Agent 1",
+        "email": "support2@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_8",
+            "name": "Customer 8",
+            "email": "customer8@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": []
+      },
+      "responseTime": 12,
+      "sentiment": "neutral",
+      "complexity": "low",
+      "customerType": "new",
+      "urgencyScore": 10,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 5,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "high",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_9",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-9",
+        "state": "open",
+        "priority": "high",
+        "category": "feature_request"
+      },
+      "created_at": 1751686415895,
+      "updated_at": 1752141493929,
+      "assignee": {
+        "id": "mock_agent_2",
+        "name": "Support Agent 2",
+        "email": "support2@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_9",
+            "name": "Customer 9",
+            "email": "customer9@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          }
+        ]
+      },
+      "responseTime": 16,
+      "sentiment": "neutral",
+      "complexity": "low",
+      "customerType": "new",
+      "urgencyScore": 7,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 40,
+      "escalationRisk": "low",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "low",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    },
+    {
+      "id": "mock_ticket_1_10",
+      "type": "ticket",
+      "ticket_attributes": {
+        "subject": "Mock Support Ticket 1-10",
+        "state": "resolved",
+        "priority": "normal",
+        "category": "billing"
+      },
+      "created_at": 1752103314070,
+      "updated_at": 1752145548339,
+      "assignee": {
+        "id": "mock_agent_1",
+        "name": "Support Agent 3",
+        "email": "support3@company.com"
+      },
+      "contacts": {
+        "contacts": [
+          {
+            "id": "mock_customer_10",
+            "name": "Customer 10",
+            "email": "customer10@example.com"
+          }
+        ]
+      },
+      "tags": {
+        "tags": [
+          {
+            "name": "urgent"
+          }
+        ]
+      },
+      "responseTime": 17,
+      "sentiment": "negative",
+      "complexity": "low",
+      "customerType": "returning",
+      "urgencyScore": 4,
+      "processed_at": "2025-07-10T13:31:43.238Z",
+      "processing_version": "2.0",
+      "resolutionTime": 64,
+      "escalationRisk": "high",
+      "similarTickets": [
+        "mock_ticket_1_1",
+        "mock_ticket_1_2",
+        "mock_ticket_1_3"
+      ],
+      "automationPotential": "low",
+      "analyzed_at": "2025-07-10T13:31:43.238Z",
+      "analysis_version": "2.0",
+      "auto_categories": [],
+      "suggested_tags": [],
+      "categorized_at": "2025-07-10T13:31:43.239Z"
+    }
+  ]
+}
