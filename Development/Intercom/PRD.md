@@ -12,7 +12,7 @@
 ### 2.1 Project Overview
 The **Intercom-Lark Automation System** is a comprehensive solution that automates the extraction, processing, and transfer of customer support data from Intercom to Lark Suite. The system features **real-time ticket notifications**, intelligent filtering, and an interactive chatbot interface for seamless team collaboration.
 
-**🆕 Current Status: Phase 3 Complete - Production Ready for Ticket Automation**
+**🆕 Current Status: Phase 3 Complete - Production Ready for L2 Onsite Support Monitoring**
 
 ### 2.2 Key Value Propositions
 - **🚀 Real-time Automation**: Instant notifications when tickets change status (`submitted → in progress → resolved → closed`)
@@ -43,12 +43,12 @@ The **Intercom-Lark Automation System** is a comprehensive solution that automat
 - **As a** Analyst, **I want to** data transformation **so that** I can work with clean, structured data
 - **As a** Manager, **I want to** automated categorization **so that** tickets are properly organized
 
-### **🆕 Phase 3: Real-time Automation** ✅ **COMPLETE**
-- **As a** Support Team, **I want to** automatic notifications when tickets change status **so that** we never miss updates
-- **As a** Team Lead, **I want to** real-time updates in our chat group **so that** everyone stays informed
-- **As a** Agent, **I want to** see all ticket notes and comments **so that** I have complete context
-- **As a** Manager, **I want to** track the complete ticket lifecycle **so that** I can monitor team performance
-- **As a** Developer, **I want to** webhook-driven updates **so that** the system responds instantly to changes
+### **🆕 Phase 3: L2 Onsite Support Monitoring** ✅ **COMPLETE**
+- **As a** L2 Support Team, **I want to** automatic notifications for site inspection requests **so that** we respond quickly to urgent onsite needs
+- **As a** L2 Team Lead, **I want to** real-time updates for L2 onsite tickets in our chat group **so that** everyone stays informed of field operations
+- **As a** L2 Agent, **I want to** see all site inspection notes and express request alerts **so that** I can prioritize urgent 3-hour requests
+- **As a** L2 Manager, **I want to** track the complete L2 onsite ticket lifecycle **so that** I can monitor field team performance
+- **As a** Developer, **I want to** webhook-driven updates for L2 onsite support **so that** the system responds instantly to site inspection requests
 
 #### Phase 4: Enhanced Lark Integration 🔄 **60% COMPLETE**
 - **As a** Team Lead, **I want to** tickets automatically created as Lark documents **so that** we can collaborate effectively

@@ -18,12 +18,12 @@ A comprehensive automation system that extracts, processes, and transfers data f
 - **Data Transformation**: Automated processing and enrichment
 - **Performance Optimization**: Efficient pagination and caching
 
-### **🆕 Phase 3: Real-time Automation**
-- **Intercom Webhook Integration**: Automatic ticket status change detection
-- **Lark Bot Notifications**: Real-time updates sent to chat groups
-- **Status Flow Tracking**: `submitted → in progress → resolved → closed`
-- **Complete Activity Logging**: All notes, comments, and updates included
-- **Multi-event Support**: Assignments, replies, notes, closures
+### **🆕 Phase 3: L2 Onsite Support Monitoring**
+- **L2 Onsite Ticket Detection**: Automatic identification of L2 onsite support tickets (Team ID: 5372074)
+- **Site Inspection Priority**: Special handling for site inspection requests with priority alerts
+- **Express Request Alerts**: Prominent alerts for 3-hour express requests
+- **Comprehensive Tracking**: All conversation updates, notes, and replies included
+- **Real-time Lark Notifications**: Formatted messages sent to chat groups instantly
 
 ### **🔄 Phase 4: Lark Integration** 
 - **Lark Suite API**: Full bot and messaging capabilities
@@ -40,21 +40,22 @@ A comprehensive automation system that extracts, processes, and transfers data f
 
 ## 🏗️ **Architecture Overview**
 
-The system uses a **webhook-driven architecture** for real-time processing:
+The system uses a **webhook-driven architecture** for real-time L2 onsite support monitoring:
 
 ```
-Intercom Tickets → Webhook Events → Your App → Lark Chat Groups
+L2 Onsite Tickets → Webhook Events → L2 Monitor → Lark Chat Groups
      ↓                ↓              ↓           ↓
-Status Changes → Event Processing → Formatting → Notifications
+Site Inspections → Event Processing → Formatting → Priority Alerts
 ```
 
 ### **Core Components**
 1. **Intercom API Client**: Handles all Intercom communication
-2. **Webhook Handler**: Processes real-time events from Intercom
-3. **Lark Bot Service**: Manages Lark Suite integration
-4. **Filtering Engine**: Advanced data processing and filtering
-5. **Export System**: Flexible data export capabilities
-6. **Monitoring System**: Health checks and performance tracking
+2. **L2 Onsite Monitor**: Specialized processor for L2 onsite support tickets
+3. **Webhook Handler**: Processes real-time events from Intercom
+4. **Lark Bot Service**: Manages Lark Suite integration and notifications
+5. **Filtering Engine**: Advanced data processing and filtering
+6. **Export System**: Flexible data export capabilities
+7. **Monitoring System**: Health checks and performance tracking
 
 ## 🚀 **Quick Start**
 
@@ -79,8 +80,8 @@ Status Changes → Event Processing → Formatting → Notifications
 - ✅ **Integrated data** - tickets stored in your Base
 - ✅ **Team collaboration** - everyone can see and edit
 
-### **Option 2: Webhook Server (Advanced)**
-Perfect for teams wanting real-time webhook processing:
+### **Option 2: L2 Onsite Support Monitoring (🆕 Recommended)**
+Perfect for teams wanting real-time L2 onsite support notifications:
 
 ```bash
 # 1. Clone and install
@@ -88,11 +89,11 @@ git clone <repository>
 cd intercom-lark-automation
 npm install
 
-# 2. Quick setup for ticket automation
+# 2. Quick setup for L2 onsite monitoring
 npm run setup:lark
 
-# 3. Follow the setup guide
-# See TICKET_AUTOMATION_SETUP.md for detailed instructions
+# 3. Follow the L2 onsite setup guide
+# See L2_ONSITE_SETUP_COMPLETE.md for detailed instructions
 
 # 4. Start the application
 npm start
@@ -133,6 +134,7 @@ Intercom/
 │   ├── services/
 │   │   ├── intercom.js        # Intercom API client
 │   │   ├── lark.js            # Lark Suite integration
+│   │   ├── l2-onsite-monitor.js # 🆕 L2 onsite support monitoring
 │   │   ├── chatbot.js         # 🆕 Bot command processing
 │   │   └── export.js          # Export processing
 │   ├── phases/
@@ -145,7 +147,8 @@ Intercom/
 │   ├── setup-lark.js          # 🆕 Lark-specific setup
 │   └── mock-setup.js          # Quick mock mode setup
 ├── docs/
-│   ├── TICKET_AUTOMATION_SETUP.md  # 🆕 Ticket automation guide
+│   ├── L2_ONSITE_SETUP_COMPLETE.md # 🆕 L2 onsite monitoring guide
+│   ├── TICKET_AUTOMATION_SETUP.md  # General ticket automation guide
 │   ├── LARK_SETUP_GUIDE.md         # Lark bot setup
 │   ├── CUSTOM_FILTERING_GUIDE.md   # Advanced filtering
 │   └── DEVELOPMENT_GUIDE.md        # Development instructions
@@ -168,10 +171,11 @@ Intercom/
 - Automated categorization
 - **Status**: Complete with 9 filter types
 
-### Phase 3: Real-time Automation ✅
-- **🆕 Intercom webhook implementation**
-- **🆕 Automatic ticket status notifications**
-- **🆕 Lark chat group integration**
+### Phase 3: L2 Onsite Support Monitoring ✅
+- **🆕 L2 onsite ticket detection and monitoring**
+- **🆕 Site inspection priority alerts**
+- **🆕 Express request notifications (3-hour SLA)**
+- **🆕 Comprehensive conversation tracking**
 - **Status**: Complete and ready for production
 
 ### Phase 4: Lark Integration 🔄
@@ -215,12 +219,12 @@ Intercom/
 
 ### Environment Variables
 
-#### Required for Ticket Automation
+#### Required for L2 Onsite Monitoring
 - `INTERCOM_TOKEN` - Your Intercom access token
 - `INTERCOM_APP_ID` - Intercom app ID
 - `LARK_APP_ID` - Lark Suite app ID
 - `LARK_APP_SECRET` - Lark Suite app secret
-- `LARK_CHAT_GROUP_ID` - **🆕 Target chat group for notifications**
+- `LARK_CHAT_GROUP_ID` - **🆕 Target chat group for L2 onsite notifications**
 
 #### Optional
 - `WEBHOOK_SECRET` - Secret for webhook validation
@@ -263,15 +267,15 @@ Intercom/
 
 ## 🔍 Usage Examples
 
-### **🆕 Ticket Automation**
+### **🆕 L2 Onsite Support Monitoring**
 ```bash
-# Set up automatic ticket notifications
+# Set up automatic L2 onsite support notifications
 # 1. Configure webhook in Intercom Developer Hub
 # 2. Add bot to Lark chat group
 # 3. Set LARK_CHAT_GROUP_ID in .env
-# 4. Start application - notifications are automatic!
+# 4. Start application - L2 onsite notifications are automatic!
 
-# Test webhook manually
+# Test L2 onsite webhook manually
 curl -X POST "http://localhost:3001/webhook/intercom" \
   -H "Content-Type: application/json" \
   -d '{"type": "conversation.admin.opened", "data": {"item": {"id": "test123"}}}'
@@ -303,8 +307,9 @@ curl -X POST http://localhost:3001/export/tickets \
 ## 📚 **Documentation**
 
 ### **🆕 Setup Guides**
-- **[LARK_BASE_AUTOMATION_GUIDE.md](LARK_BASE_AUTOMATION_GUIDE.md)** - **🆕 Zero-hosting solution using Lark Base automation**
-- **[TICKET_AUTOMATION_SETUP.md](TICKET_AUTOMATION_SETUP.md)** - Complete guide for webhook-based notifications
+- **[L2_ONSITE_SETUP_COMPLETE.md](L2_ONSITE_SETUP_COMPLETE.md)** - **🆕 Complete L2 onsite support monitoring setup**
+- **[LARK_BASE_AUTOMATION_GUIDE.md](LARK_BASE_AUTOMATION_GUIDE.md)** - Zero-hosting solution using Lark Base automation
+- [TICKET_AUTOMATION_SETUP.md](TICKET_AUTOMATION_SETUP.md) - General webhook-based notifications
 - [LARK_SETUP_GUIDE.md](LARK_SETUP_GUIDE.md) - Lark Suite bot setup
 - [LARK_API_SETUP_GUIDE.md](LARK_API_SETUP_GUIDE.md) - Lark API credentials
 
@@ -319,18 +324,19 @@ curl -X POST http://localhost:3001/export/tickets \
 
 ## 🎉 **What's New in This Version**
 
-### **🆕 Ticket Automation Features**
-- **Real-time Notifications**: Automatic Lark messages when tickets change status
+### **🆕 L2 Onsite Support Monitoring Features**
+- **L2 Onsite Ticket Detection**: Automatic identification of L2 onsite support tickets (Team ID: 5372074)
+- **Site Inspection Priority**: Special handling for site inspection requests with priority alerts
+- **Express Request Alerts**: Prominent notifications for 3-hour express requests
 - **Complete Activity Tracking**: All notes, comments, and updates included
-- **Status Flow Mapping**: `submitted → in progress → resolved → closed`
-- **Rich Message Formatting**: Emojis, links, and structured information
-- **Multi-event Support**: Handles assignments, replies, notes, closures
+- **Rich Message Formatting**: Emojis, links, and structured information with merchant details
 
-### **🆕 Webhook System**
-- **Intercom Webhook Handler**: Processes ticket status changes
-- **Lark Bot Integration**: Sends formatted messages to chat groups
-- **Event Processing**: Handles 7 different Intercom event types
-- **Error Handling**: Comprehensive logging and error recovery
+### **🆕 L2 Onsite Monitoring System**
+- **L2 Onsite Monitor**: Specialized processor for L2 onsite support tickets
+- **Site Inspection Detection**: Identifies site inspection requests specifically
+- **Express Request Processing**: Handles urgent 3-hour express requests
+- **Comprehensive Tracking**: Processes all conversation updates and notes
+- **Error Handling**: Robust logging and error recovery
 
 ### **🆕 Enhanced Setup**
 - **Streamlined Configuration**: New setup scripts for common use cases
@@ -375,4 +381,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**🎯 Perfect for teams wanting automated ticket notifications from Intercom to Lark chat groups with complete activity tracking and real-time updates!** 
+**🎯 Perfect for L2 support teams wanting automated site inspection notifications from Intercom to Lark chat groups with express request alerts and comprehensive tracking!** 
