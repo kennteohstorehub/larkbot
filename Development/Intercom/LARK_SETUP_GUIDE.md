@@ -376,7 +376,7 @@ Create or edit `.env` in your project folder:
 
 ```bash
 # Intercom Configuration
-INTERCOM_TOKEN=***REMOVED***
+INTERCOM_TOKEN=your_intercom_token_here
 INTERCOM_APP_ID=***REMOVED***
 
 # Application Configuration
@@ -415,7 +415,7 @@ Go to: https://reqbin.com/
 - **Method**: GET
 - **URL**: `https://api.intercom.io/me`
 - **Headers**:
-  - `Authorization`: `Bearer ***REMOVED***`
+  - `Authorization`: `Bearer your_intercom_token_here`
   - `Accept`: `application/json`
 
 ### **Step 3: Click "Send"**
@@ -427,7 +427,7 @@ Once basic auth works, test data access:
 
 ```bash
 # Test conversations
-curl -X GET "https://api.intercom.io/conversations" -H "Authorization: Bearer ***REMOVED***" -H "Accept: application/json"
+curl -X GET "https://api.intercom.io/conversations" -H "Authorization: Bearer your_intercom_token_here" -H "Accept: application/json"
 ```
 
 ## 🎯 **What to Do Right Now:**

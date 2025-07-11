@@ -294,7 +294,7 @@ npm install --save-dev nodemon jest
 # Create .env with your working credentials
 cat > .env << 'EOF'
 # Intercom Configuration - CONFIRMED WORKING
-INTERCOM_TOKEN=***REMOVED***
+INTERCOM_TOKEN=your_intercom_token_here
 INTERCOM_APP_ID=***REMOVED***
 
 # Lark Suite Configuration - CONFIRMED WORKING
@@ -608,7 +608,7 @@ git push -u origin main
 ```bash
 # Search for conversations with "L2 onsite support" in the content
 curl -X GET "https://api.intercom.io/conversations/search" \
-  -H "Authorization: Bearer ***REMOVED***" \
+  -H "Authorization: Bearer your_intercom_token_here" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{
@@ -630,7 +630,7 @@ curl -X GET "https://api.intercom.io/conversations/search" \
 ```bash
 # Search for conversations with specific tags
 curl -X GET "https://api.intercom.io/conversations/search" \
-  -H "Authorization: Bearer ***REMOVED***" \
+  -H "Authorization: Bearer your_intercom_token_here" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{
@@ -652,7 +652,7 @@ curl -X GET "https://api.intercom.io/conversations/search" \
 ```bash
 # Search for tickets with custom attributes
 curl -X GET "https://api.intercom.io/conversations/search" \
-  -H "Authorization: Bearer ***REMOVED***" \
+  -H "Authorization: Bearer your_intercom_token_here" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{
