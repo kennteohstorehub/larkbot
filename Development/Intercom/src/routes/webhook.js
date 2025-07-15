@@ -35,6 +35,14 @@ function verifySignature(req, res, next) {
 }
 
 /**
+ * Handle Lark webhook validation (HEAD request)
+ */
+router.head('/lark', (req, res) => {
+  logger.info('🔍 Lark webhook endpoint validation (HEAD request)');
+  res.status(200).end();
+});
+
+/**
  * Handle Lark webhook events
  */
 router.post('/lark', verifySignature, async (req, res) => {
@@ -193,6 +201,15 @@ function extractTextFromPost(content) {
   // Simplified extraction - in practice, you'd need to handle complex post structures
   return JSON.stringify(content.post);
 }
+
+/**
+ * Handle Intercom webhook validation (HEAD request)
+ * Intercom sends HEAD requests to validate webhook endpoints
+ */
+router.head('/intercom', (req, res) => {
+  logger.info('🔍 Intercom webhook endpoint validation (HEAD request)');
+  res.status(200).end();
+});
 
 /**
  * Handle Intercom webhook events

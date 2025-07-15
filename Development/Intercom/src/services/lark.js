@@ -57,6 +57,63 @@ class LarkService {
   }
 
   /**
+   * Get list of chats the bot belongs to
+   * Useful for finding chat group IDs
+   */
+  async getChats(params = {}) {
+    logger.info('💬 Getting Lark chats list');
+
+    const queryParams = {
+      page_size: params.pageSize || 20,
+      ...params
+    };
+
+    try {
+      const response = await this.makeRequest('GET', '/im/v1/chats', null, queryParams);
+      
+      if (response.code === 0) {
+        logger.info('✅ Chats retrieved successfully', { 
+          count: response.data.items?.length,
+          hasMore: response.data.has_more 
+        });
+        return response.data;
+      } else {
+        throw new Error(`Failed to get chats: ${response.msg}`);
+      }
+
+    } catch (error) {
+      logger.error('❌ Failed to get Lark chats', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Get specific chat information
+   */
+  async getChatInfo(chatId) {
+    logger.info('💬 Getting chat information', { chatId });
+
+    try {
+      const response = await this.makeRequest('GET', `/im/v1/chats/${chatId}`);
+      
+      if (response.code === 0) {
+        logger.info('✅ Chat info retrieved successfully', { 
+          chatId,
+          name: response.data.name,
+          chatMode: response.data.chat_mode
+        });
+        return response.data;
+      } else {
+        throw new Error(`Failed to get chat info: ${response.msg}`);
+      }
+
+    } catch (error) {
+      logger.error('❌ Failed to get chat info', { chatId, error: error.message });
+      throw error;
+    }
+  }
+
+  /**
    * Get tenant access token
    */
   async getAccessToken() {
@@ -146,19 +203,25 @@ class LarkService {
   }
 
   /**
-   * Send message to Lark chat
+   * Send message to Lark chat with enhanced options
    */
-  async sendMessage(chatId, content, messageType = 'text') {
+  async sendMessage(chatId, content, messageType = 'text', options = {}) {
     logger.info('📤 Sending message to Lark chat', { chatId, messageType });
 
     const messageData = {
       receive_id: chatId,
       msg_type: messageType,
-      content: JSON.stringify(content)
+      content: typeof content === 'string' ? content : JSON.stringify(content),
+      ...options
+    };
+
+    // Add receive_id_type parameter for chat_id
+    const params = {
+      receive_id_type: 'chat_id'
     };
 
     try {
-      const response = await this.makeRequest('POST', this.endpoints.messages, messageData);
+      const response = await this.makeRequest('POST', this.endpoints.messages, messageData, params);
       
       if (response.code === 0) {
         logger.info('✅ Message sent successfully', { messageId: response.data.message_id });

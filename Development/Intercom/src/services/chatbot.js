@@ -171,23 +171,57 @@ class ChatbotService {
   }
 
   /**
-   * Execute a command
+   * Execute command based on parsed input
    */
   async executeCommand(command, chatId, userId) {
     const { name, args } = command;
     
-    const commandHandler = this.commands.get(name);
-    if (!commandHandler) {
-      return await this.sendMessage(chatId, `❌ Unknown command: ${name}\nUse /help to see available commands.`);
-    }
+    logger.info('🎯 Executing command', { name, args, chatId, userId });
 
-    logger.info(`🤖 Executing command: ${name}`, { args, chatId, userId });
+    switch (name) {
+      case 'help':
+        return await this.handleHelpCommand(args, chatId, userId);
+      
+      case 'ticket':
+        return await this.handleTicketCommand(args, chatId, userId);
+      
+      case 'tickets':
+        return await this.handleTicketsCommand(args, chatId, userId);
+      
+      case 'status':
+        return await this.handleStatusCommand(args, chatId, userId);
+      
+      case 'conversation':
+        return await this.handleConversationCommand(args, chatId, userId);
+      
+      case 'conversations':
+        return await this.handleConversationsCommand(args, chatId, userId);
+      
+      case 'summary':
+        return await this.handleSummaryCommand(args, chatId, userId);
+      
+      case 'export':
+        return await this.handleExportCommand(args, chatId, userId);
+      
+      case 'tickets-custom':
+        return await this.handleCustomTicketsCommand(args, chatId, userId);
+      
+      case 'tickets-type':
+        return await this.handleTicketTypeCommand(args, chatId, userId);
+      
+      case 'filter-tickets':
+        return await this.handleAdvancedFilterCommand(args, chatId, userId);
 
-    try {
-      return await commandHandler.handler(args, chatId, userId);
-    } catch (error) {
-      logger.error(`❌ Command execution failed: ${name}`, { error: error.message });
-      return await this.sendErrorMessage(chatId, `Failed to execute ${name}: ${error.message}`);
+      case 'get-chat-id':
+        return await this.handleGetChatIdCommand(args, chatId, userId);
+
+      case 'list-chats':
+        return await this.handleListChatsCommand(args, chatId, userId);
+      
+      default:
+        return await this.sendMessage(chatId, 
+          `❌ Unknown command: ${name}\n\nType /help to see available commands.`
+        );
     }
   }
 
@@ -592,21 +626,37 @@ class ChatbotService {
    * Handle /help command
    */
   async handleHelpCommand(args, chatId, userId) {
-    if (args.length > 0) {
-      // Help for specific command
-      const commandName = args[0];
-      const command = this.commands.get(commandName);
-      
-      if (!command) {
-        return await this.sendMessage(chatId, `❌ Unknown command: ${commandName}`);
-      }
+    const helpMessage = `🤖 **Intercom Ticket Bot - Available Commands**
 
-      const message = `📖 **${commandName}**\n\n**Description:** ${command.description}\n**Usage:** ${command.usage}`;
-      return await this.sendMessage(chatId, message);
-    }
+**📋 Ticket Commands:**
+• \`/ticket <id>\` - Get specific ticket details
+• \`/tickets\` - List recent tickets (default: 10)
+• \`/tickets <number>\` - List specific number of tickets
+• \`/status <id>\` - Get ticket status
 
-    // General help
-    const helpMessage = this.formatHelpMessage();
+**💬 Conversation Commands:**
+• \`/conversation <id>\` - Get conversation details
+• \`/conversations\` - List recent conversations
+
+**🔍 Advanced Filtering:**
+• \`/tickets-custom <filters>\` - Filter by custom attributes
+• \`/tickets-type <type>\` - Filter by ticket type
+• \`/filter-tickets <criteria>\` - Advanced filtering
+
+**📊 Reports & Export:**
+• \`/summary\` - Get daily ticket summary
+• \`/export <type>\` - Export data (conversations, tickets, contacts)
+
+**🔧 Setup & Configuration:**
+• \`/get-chat-id\` - Get this chat group's ID
+• \`/list-chats\` - List all chats the bot belongs to
+• \`/help\` - Show this help message
+
+**💡 Tips:**
+- Use filters like: \`custom=priority:high\` or \`state=open\`
+- Export formats: \`json\`, \`csv\`
+- For setup help, use \`/get-chat-id\` to configure notifications`;
+
     return await this.sendMessage(chatId, helpMessage);
   }
 
@@ -650,6 +700,93 @@ class ChatbotService {
     } catch (error) {
       logger.error('❌ Failed to get ticket details', { ticketId, error: error.message });
       throw error;
+    }
+  }
+
+  /**
+   * Handle /get-chat-id command
+   * Returns the current chat group ID for configuration
+   */
+  async handleGetChatIdCommand(args, chatId, userId) {
+    logger.info('🔍 Getting chat ID', { chatId, userId });
+
+    try {
+      // Get chat information
+      const chatInfo = await larkService.getChatInfo(chatId);
+      
+      const message = `🔍 **Chat Group Information**
+
+**Chat ID:** \`${chatId}\`
+**Chat Name:** ${chatInfo.name || 'Unknown'}
+**Chat Type:** ${chatInfo.chat_mode || 'Unknown'}
+
+**📋 Configuration Instructions:**
+1. Copy the Chat ID above
+2. Add to your \`.env\` file:
+   \`LARK_CHAT_GROUP_ID=${chatId}\`
+3. Restart your application
+4. Test webhook notifications
+
+**💡 This ID is needed for automatic ticket notifications!**`;
+
+      return await this.sendMessage(chatId, message);
+
+    } catch (error) {
+      // Fallback - at least provide the chat ID even if we can't get details
+      const message = `🔍 **Chat Group ID**
+
+**Chat ID:** \`${chatId}\`
+
+**📋 Configuration Instructions:**
+1. Copy the Chat ID above
+2. Add to your \`.env\` file:
+   \`LARK_CHAT_GROUP_ID=${chatId}\`
+3. Restart your application
+4. Test webhook notifications
+
+**⚠️ Note:** Could not retrieve additional chat details, but the ID above is correct.`;
+
+      return await this.sendMessage(chatId, message);
+    }
+  }
+
+  /**
+   * Handle /list-chats command
+   * Lists all chats the bot belongs to
+   */
+  async handleListChatsCommand(args, chatId, userId) {
+    logger.info('📋 Listing chats', { chatId, userId });
+
+    try {
+      const chatsData = await larkService.getChats({ pageSize: 50 });
+      
+      if (!chatsData.items || chatsData.items.length === 0) {
+        return await this.sendMessage(chatId, '📭 No chats found. The bot may not be added to any groups yet.');
+      }
+
+      let message = `💬 **Bot Chat Groups** (${chatsData.items.length} found)\n\n`;
+
+      chatsData.items.forEach((chat, index) => {
+        const isCurrentChat = chat.chat_id === chatId;
+        const indicator = isCurrentChat ? '👈 **Current Chat**' : '';
+        
+        message += `**${index + 1}. ${chat.name || 'Unnamed Chat'}** ${indicator}
+• **ID:** \`${chat.chat_id}\`
+• **Type:** ${chat.chat_mode || 'Unknown'}
+• **Members:** ${chat.member_count || 'Unknown'}
+
+`;
+      });
+
+      message += `**💡 Usage:**
+• Use \`/get-chat-id\` to get setup instructions for current chat
+• Copy any Chat ID above to configure notifications
+• Add to \`.env\`: \`LARK_CHAT_GROUP_ID=<chat_id>\``;
+
+      return await this.sendMessage(chatId, message);
+
+    } catch (error) {
+      return await this.sendErrorMessage(chatId, `Failed to list chats: ${error.message}`);
     }
   }
 
