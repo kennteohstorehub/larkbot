@@ -10,6 +10,7 @@ class L2OnsiteMonitor {
   constructor() {
     this.targetTeamId = '5372074'; // L2 Onsite Support Team
     this.targetOnsiteTypes = [
+      'New & Existing Merchant site inspection', // EXACT match from your data
       'Site inspection New and Existing merchants',
       '🔍 Site inspection New and Existing merchants',
       'site inspection',
@@ -261,18 +262,27 @@ class L2OnsiteMonitor {
       const message = this.formatConversationUpdateMessage(ticketDetails, updateDetails);
       
       // Send to Lark
-      const success = await larkService.sendMessage(message);
+      const larkChatId = process.env.LARK_CHAT_GROUP_ID;
+      
+      if (!larkChatId) {
+        logger.warn('No Lark chat group configured for L2 onsite notifications');
+        return false;
+      }
+      
+      const success = await larkService.sendMessage(larkChatId, { text: message }, 'text');
       
       if (success) {
         logger.info('Site inspection ticket update sent to Lark', { 
           ticketId: ticketDetails.id,
           updateType: updateDetails.type,
-          isSiteInspection: true
+          isSiteInspection: true,
+          chatId: larkChatId
         });
       } else {
         logger.error('Failed to send site inspection ticket update to Lark', { 
           ticketId: ticketDetails.id,
-          updateType: updateDetails.type
+          updateType: updateDetails.type,
+          chatId: larkChatId
         });
       }
       
