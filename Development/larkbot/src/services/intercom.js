@@ -1,4 +1,4 @@
-const { Client } = require('intercom-client');
+const { IntercomClient } = require('intercom-client');
 const config = require('../config');
 const logger = require('../utils/logger');
 
@@ -26,7 +26,7 @@ class IntercomService {
         throw new Error('Intercom token is required');
       }
 
-      this.client = new Client({
+      this.client = new IntercomClient({
         tokenAuth: { token: config.intercom.token }
       });
 
