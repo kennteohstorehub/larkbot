@@ -27,7 +27,7 @@ class IntercomService {
       }
 
       this.client = new IntercomClient({
-        tokenAuth: { token: config.intercom.token }
+        token: config.intercom.token
       });
 
       // Test connection
@@ -49,7 +49,7 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/me');
       
-      const response = await this.client.admins.me();
+      const response = await this.client.admins.identify();
       const duration = Date.now() - startTime;
       
       logger.logApiResponse('Intercom', 'GET', '/me', 200, response);
@@ -129,7 +129,42 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/conversations', params);
 
-      const response = await this.client.conversations.list(params);
+      // For v6.4.0, list returns a pageable response
+      // We need to handle pagination differently now
+      const pageableResponse = await this.client.conversations.list({
+        per_page: params.per_page
+      });
+      
+      // Collect conversations for the requested "page"
+      const conversations = [];
+      let currentPage = 1;
+      let hasMore = false;
+      
+      for await (const conversation of pageableResponse) {
+        // Skip conversations until we reach the requested page
+        if (currentPage < params.page) {
+          if (conversations.length >= params.per_page) {
+            conversations.length = 0; // Clear array for next page
+            currentPage++;
+          }
+          conversations.push(conversation);
+          continue;
+        }
+        
+        // Collect conversations for the current page
+        if (currentPage === params.page && conversations.length < params.per_page) {
+          conversations.push(conversation);
+        } else {
+          hasMore = true;
+          break;
+        }
+      }
+      
+      const response = {
+        conversations,
+        total_count: -1, // Unknown with new API
+        pages: { next: hasMore ? {} : null }
+      };
       const duration = Date.now() - startTime;
 
       logger.logApiResponse('Intercom', 'GET', '/conversations', 200, response);
@@ -166,7 +201,7 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', `/conversations/${conversationId}`);
 
-      const response = await this.client.conversations.find({ id: conversationId });
+      const response = await this.client.conversations.find({ conversation_id: conversationId });
       const duration = Date.now() - startTime;
 
       logger.logApiResponse('Intercom', 'GET', `/conversations/${conversationId}`, 200, response);
@@ -199,7 +234,49 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/tickets', params);
 
-      const response = await this.client.tickets.list(params);
+      // For v6.4.0, tickets use search instead of list
+      // We need to search for all tickets created after timestamp 0
+      const pageableResponse = await this.client.tickets.search({
+        query: {
+          field: 'created_at',
+          operator: '>',
+          value: '0'
+        },
+        pagination: {
+          per_page: params.per_page
+        }
+      });
+      
+      // Collect tickets for the requested "page"
+      const tickets = [];
+      let currentPage = 1;
+      let hasMore = false;
+      
+      for await (const ticket of pageableResponse) {
+        // Skip tickets until we reach the requested page
+        if (currentPage < params.page) {
+          if (tickets.length >= params.per_page) {
+            tickets.length = 0; // Clear array for next page
+            currentPage++;
+          }
+          tickets.push(ticket);
+          continue;
+        }
+        
+        // Collect tickets for the current page
+        if (currentPage === params.page && tickets.length < params.per_page) {
+          tickets.push(ticket);
+        } else {
+          hasMore = true;
+          break;
+        }
+      }
+      
+      const response = {
+        tickets,
+        total_count: -1, // Unknown with new API
+        pages: { next: hasMore ? {} : null }
+      };
       const duration = Date.now() - startTime;
 
       logger.logApiResponse('Intercom', 'GET', '/tickets', 200, response);
@@ -243,7 +320,41 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/contacts', params);
 
-      const response = await this.client.contacts.list(params);
+      // For v6.4.0, list returns a pageable response
+      const pageableResponse = await this.client.contacts.list({
+        per_page: params.per_page
+      });
+      
+      // Collect contacts for the requested "page"
+      const contacts = [];
+      let currentPage = 1;
+      let hasMore = false;
+      
+      for await (const contact of pageableResponse) {
+        // Skip contacts until we reach the requested page
+        if (currentPage < params.page) {
+          if (contacts.length >= params.per_page) {
+            contacts.length = 0; // Clear array for next page
+            currentPage++;
+          }
+          contacts.push(contact);
+          continue;
+        }
+        
+        // Collect contacts for the current page
+        if (currentPage === params.page && contacts.length < params.per_page) {
+          contacts.push(contact);
+        } else {
+          hasMore = true;
+          break;
+        }
+      }
+      
+      const response = {
+        contacts,
+        total_count: -1, // Unknown with new API
+        pages: { next: hasMore ? {} : null }
+      };
       const duration = Date.now() - startTime;
 
       logger.logApiResponse('Intercom', 'GET', '/contacts', 200, response);
