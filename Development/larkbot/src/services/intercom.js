@@ -1,4 +1,4 @@
-const { IntercomClient } = require('intercom-client');
+const { Client } = require('intercom-client');
 const config = require('../config');
 const logger = require('../utils/logger');
 
@@ -26,13 +26,13 @@ class IntercomService {
         throw new Error('Intercom token is required');
       }
 
-      this.client = new IntercomClient({
-        token: config.intercom.token
+      this.client = new Client({
+        tokenAuth: { token: config.intercom.token }
       });
 
       // Test connection
       await this.testConnection();
-      
+
       this.isInitialized = true;
       logger.info('Intercom service initialized successfully');
     } catch (error) {
@@ -48,19 +48,19 @@ class IntercomService {
     try {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/me');
-      
-      const response = await this.client.admins.identify();
+
+      const response = await this.client.admins.me();
       const duration = Date.now() - startTime;
-      
+
       logger.logApiResponse('Intercom', 'GET', '/me', 200, response);
       logger.logPerformance('Intercom.testConnection', duration);
-      
+
       logger.info('Intercom connection successful', {
         adminName: response.name,
         adminEmail: response.email,
         appId: config.intercom.appId
       });
-      
+
       return response;
     } catch (error) {
       logger.logError('IntercomService.testConnection', error);
@@ -86,7 +86,7 @@ class IntercomService {
       const waitTime = this.rateLimitInfo.resetTime - Date.now();
       if (waitTime > 0) {
         logger.warn(`Rate limit approaching. Waiting ${waitTime}ms`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
   }
@@ -134,12 +134,12 @@ class IntercomService {
       const pageableResponse = await this.client.conversations.list({
         per_page: params.per_page
       });
-      
+
       // Collect conversations for the requested "page"
       const conversations = [];
       let currentPage = 1;
       let hasMore = false;
-      
+
       for await (const conversation of pageableResponse) {
         // Skip conversations until we reach the requested page
         if (currentPage < params.page) {
@@ -150,7 +150,7 @@ class IntercomService {
           conversations.push(conversation);
           continue;
         }
-        
+
         // Collect conversations for the current page
         if (currentPage === params.page && conversations.length < params.per_page) {
           conversations.push(conversation);
@@ -159,7 +159,7 @@ class IntercomService {
           break;
         }
       }
-      
+
       const response = {
         conversations,
         total_count: -1, // Unknown with new API
@@ -246,12 +246,12 @@ class IntercomService {
           per_page: params.per_page
         }
       });
-      
+
       // Collect tickets for the requested "page"
       const tickets = [];
       let currentPage = 1;
       let hasMore = false;
-      
+
       for await (const ticket of pageableResponse) {
         // Skip tickets until we reach the requested page
         if (currentPage < params.page) {
@@ -262,7 +262,7 @@ class IntercomService {
           tickets.push(ticket);
           continue;
         }
-        
+
         // Collect tickets for the current page
         if (currentPage === params.page && tickets.length < params.per_page) {
           tickets.push(ticket);
@@ -271,7 +271,7 @@ class IntercomService {
           break;
         }
       }
-      
+
       const response = {
         tickets,
         total_count: -1, // Unknown with new API
@@ -324,12 +324,12 @@ class IntercomService {
       const pageableResponse = await this.client.contacts.list({
         per_page: params.per_page
       });
-      
+
       // Collect contacts for the requested "page"
       const contacts = [];
       let currentPage = 1;
       let hasMore = false;
-      
+
       for await (const contact of pageableResponse) {
         // Skip contacts until we reach the requested page
         if (currentPage < params.page) {
@@ -340,7 +340,7 @@ class IntercomService {
           contacts.push(contact);
           continue;
         }
-        
+
         // Collect contacts for the current page
         if (currentPage === params.page && contacts.length < params.per_page) {
           contacts.push(contact);
@@ -349,7 +349,7 @@ class IntercomService {
           break;
         }
       }
-      
+
       const response = {
         contacts,
         total_count: -1, // Unknown with new API
@@ -397,7 +397,7 @@ class IntercomService {
     while (hasMore && allConversations.length < limit) {
       try {
         const response = await this.getConversations({ page, perPage });
-        
+
         allConversations.push(...response.conversations);
         hasMore = response.hasMore;
         page++;
@@ -423,8 +423,7 @@ class IntercomService {
         }
 
         // Small delay to be respectful to the API
-        await new Promise(resolve => setTimeout(resolve, 100));
-
+        await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
         logger.logError('IntercomService.getAllConversations', error, { page });
         throw error;
@@ -463,4 +462,4 @@ class IntercomService {
 // Create singleton instance
 const intercomService = new IntercomService();
 
-module.exports = intercomService; 
+module.exports = intercomService;
