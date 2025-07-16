@@ -1,0 +1,71 @@
+services:
+  - type: web
+    name: larkbot-production
+    env: node
+    buildCommand: npm ci
+    startCommand: npm start
+    plan: starter
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: LOG_LEVEL
+        value: info
+      - key: ENABLE_WEBHOOKS
+        value: true
+      - key: ENABLE_CHATBOT
+        value: true
+      - key: ENABLE_MONITORING
+        value: true
+      - key: ENABLE_RATE_LIMITING
+        value: true
+      - key: DEBUG_MODE
+        value: false
+        
+    # These should be set as secret environment variables in Render dashboard
+    # - INTERCOM_TOKEN
+    # - INTERCOM_APP_ID  
+    # - INTERCOM_WEBHOOK_SECRET
+    # - LARK_APP_ID
+    # - LARK_APP_SECRET
+    # - LARK_WEBHOOK_SECRET
+    # - LARK_CHAT_GROUP_ID
+    # - WEBHOOK_SECRET
+    
+    healthCheckPath: /health
+    
+    # Domains and networking
+    domains:
+      - larkbot-production.onrender.com
+      
+    # Auto-deploy settings
+    autoDeploy: true
+    branch: main
+    
+    # Runtime settings
+    runtime: nodejs18
+    
+    # Scaling settings
+    numInstances: 1
+    
+    # Resource limits
+    disk: 512MB
+    
+    # Build settings
+    buildFilter:
+      paths:
+        - src/**
+        - package.json
+        - package-lock.json
+        - Dockerfile
+        - ecosystem.config.js
+        
+    # Pre-deploy commands
+    preDeployCommand: |
+      npm ci --only=production
+      
+    # Post-deploy commands  
+    postDeployCommand: |
+      echo "Larkbot deployment completed successfully"
