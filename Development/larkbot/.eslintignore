@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Temporary files
+tmp/
+temp/
+
+# Exports
+exports/
+
+# Configuration files
+.env*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Documentation
+*.md
+
+# PM2
+ecosystem.config.js
+
+# Test files (if you want to exclude them)
+# *.test.js
+# *.spec.js

@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Main application
+  larkbot:
+    build: 
+      context: .
+      target: development
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql://larkbot:larkbot123@postgres:5432/larkbot
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - ./exports:/app/exports
+    restart: unless-stopped
+    networks:
+      - larkbot-network
+
+  # Redis for caching and queuing
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - larkbot-network
+
+  # PostgreSQL database (for future use)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: larkbot
+      POSTGRES_PASSWORD: larkbot123
+      POSTGRES_DB: larkbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - larkbot-network
+
+  # Redis Commander (Redis GUI)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - larkbot-network
+
+  # pgAdmin (PostgreSQL GUI)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@larkbot.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - larkbot-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  larkbot-network:
+    driver: bridge
