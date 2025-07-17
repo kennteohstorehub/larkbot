@@ -50,7 +50,8 @@ class IntercomService {
       const startTime = Date.now();
       logger.logApiRequest('Intercom', 'GET', '/me');
 
-      const response = await this.client.admins.me();
+      // Test connection by listing admins (me() method might not exist)
+      const response = await this.client.admins.list();
       const duration = Date.now() - startTime;
 
       logger.logApiResponse('Intercom', 'GET', '/me', 200, response);
