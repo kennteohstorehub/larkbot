@@ -33,8 +33,16 @@ class ServicesManager {
     try {
       logger.info('Initializing services...');
 
-      // Initialize Intercom service
-      await this.services.intercom.initialize();
+      // Initialize Intercom service (optional - continue if it fails)
+      try {
+        await this.services.intercom.initialize();
+        logger.info('Intercom service initialized successfully');
+      } catch (error) {
+        logger.error('Failed to initialize Intercom service, continuing without it', { 
+          error: error.message 
+        });
+        // Continue without Intercom - webhook will still work for receiving events
+      }
 
       // Initialize Export service
       await this.services.export.initialize();
