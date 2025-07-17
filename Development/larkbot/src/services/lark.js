@@ -168,6 +168,32 @@ class LarkService {
   }
 
   /**
+   * Send interactive card message to Lark chat
+   */
+  async sendInteractiveCard(chatId, cardContent) {
+    logger.info('📤 Sending interactive card to Lark chat', { chatId });
+
+    try {
+      const response = await this.makeRequest('POST', this.endpoints.messages, {
+        receive_id: chatId,
+        msg_type: 'interactive',
+        content: JSON.stringify(cardContent)
+      }, {
+        receive_id_type: 'chat_id'
+      });
+
+      if (response.code === 0) {
+        logger.info('✅ Interactive card sent successfully', { messageId: response.data.message_id });
+        return response.data;
+      }
+      throw new Error(`Failed to send interactive card: ${response.msg}`);
+    } catch (error) {
+      logger.error('❌ Failed to send Lark interactive card', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
    * Create document in Lark Docs
    */
   async createDocument(title, content = '') {

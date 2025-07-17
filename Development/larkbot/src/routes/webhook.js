@@ -643,29 +643,32 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
       }
     }
 
-    // Format the message for Lark using enriched ticket data
-    const message = formatTicketUpdateMessage(enrichedTicket, eventType, metadata);
+    // Format the message as an interactive card for L2 onsite tickets
+    const cardContent = formatTicketAsCard(enrichedTicket, eventType, metadata);
     
-    logger.info('📝 Formatted Lark message', {
+    logger.info('📝 Formatted Lark card', {
       ticketId: enrichedTicket.id,
-      messageLength: message.length,
-      messagePreview: message.substring(0, 500) + (message.length > 500 ? '...' : ''),
-      // Log the full message for debugging
-      fullMessage: message
+      eventType,
+      hasCard: !!cardContent,
+      cardTemplate: cardContent?.header?.template
     });
+
+    // Import larkService for sending cards
+    const larkService = require('../services/lark');
 
     // Send to all configured Lark groups
     const sendPromises = chatGroups.map(async (group) => {
       try {
-        await chatbotService.sendMessage(group.id, message);
-        logger.info('✅ L2 onsite ticket update sent to Lark group', {
+        // Use the new sendInteractiveCard method
+        await larkService.sendInteractiveCard(group.id, cardContent);
+        logger.info('✅ L2 onsite ticket update sent to Lark group as card', {
           ticketId: enrichedTicket.id,
           eventType,
           chatId: group.id,
           groupName: group.name
         });
       } catch (error) {
-        logger.error('❌ Failed to send to Lark group', {
+        logger.error('❌ Failed to send card to Lark group', {
           ticketId: enrichedTicket.id,
           eventType,
           groupName: group.name,
@@ -766,6 +769,211 @@ function formatTicketUpdateMessage(ticket, eventType, metadata = {}) {
   message += `\n[View in Intercom](https://app.intercom.io/a/apps/${process.env.INTERCOM_APP_ID}/inbox/conversation/${ticket.id})`;
 
   return message;
+}
+
+/**
+ * Format ticket message as interactive card
+ */
+function formatTicketAsCard(ticket, eventType, metadata = {}) {
+  const customAttrs = ticket.custom_attributes || {};
+  
+  // Get event type emoji and title
+  const eventConfigs = {
+    opened: { emoji: '🆕', title: 'NEW SITE INSPECTION REQUEST', template: 'blue' },
+    assigned: { emoji: '👤', title: 'SITE INSPECTION ASSIGNED', template: 'blue' },
+    replied: { emoji: '💬', title: 'ADMIN REPLY ADDED', template: 'turquoise' },
+    note_added: { emoji: '📝', title: 'NOTE ADDED', template: 'yellow' },
+    closed: { emoji: '🔒', title: 'SITE INSPECTION CLOSED', template: 'green' },
+    reopened: { emoji: '🔄', title: 'SITE INSPECTION REOPENED', template: 'orange' }
+  };
+
+  const config = eventConfigs[eventType] || { 
+    emoji: '📋', 
+    title: 'SITE INSPECTION UPDATE', 
+    template: 'blue' 
+  };
+
+  // Create card elements
+  const elements = [];
+
+  // Basic ticket info section
+  const basicInfo = [];
+  
+  // Add state with color indicator
+  const stateColors = {
+    open: '🟢',
+    closed: '🔴',
+    snoozed: '🟡'
+  };
+  basicInfo.push({
+    tag: 'plain_text',
+    content: `${stateColors[ticket.state] || '⚪'} State: ${ticket.state || 'open'}`
+  });
+
+  // Express request status
+  const expressRequest = customAttrs['Express Request - 3 hours Onsite Request'];
+  const isExpress = expressRequest && expressRequest.toLowerCase() === 'yes';
+  basicInfo.push({
+    tag: 'plain_text',
+    content: isExpress ? '⚡ EXPRESS (3 HOURS)' : '⏱️ STANDARD REQUEST'
+  });
+
+  elements.push({
+    tag: 'div',
+    fields: basicInfo
+  });
+
+  // Merchant details section
+  elements.push({
+    tag: 'div',
+    text: {
+      tag: 'lark_md',
+      content: `**Merchant Details:**
+• **Name:** ${customAttrs['🆔 Merchant Account Name'] || 'Unknown'}
+• **Country:** ${customAttrs['🌎 Country'] || 'Unknown'}
+• **Contact:** ${customAttrs['PIC Name'] || 'Unknown'} - ${customAttrs['PIC Contact Number'] || 'Unknown'}
+• **Address:** ${customAttrs['FULL Store Address'] || 'Unknown'}`
+    }
+  });
+
+  // Request description if available
+  if (customAttrs['Onsite request description']) {
+    elements.push({
+      tag: 'hr'
+    });
+    elements.push({
+      tag: 'div',
+      text: {
+        tag: 'lark_md',
+        content: `**Request Description:**\n${customAttrs['Onsite request description']}`
+      }
+    });
+  }
+
+  // Conversation and notes section
+  if (ticket.conversation_parts && ticket.conversation_parts.conversation_parts && ticket.conversation_parts.conversation_parts.length > 0) {
+    elements.push({
+      tag: 'hr'
+    });
+    
+    const parts = ticket.conversation_parts.conversation_parts;
+    const sortedParts = [...parts].sort((a, b) => a.created_at - b.created_at);
+    const recentParts = sortedParts.slice(-5); // Show last 5 for card format
+
+    const conversationContent = recentParts.map(part => {
+      const author = part.author?.name || part.author?.email || 'Unknown';
+      const timestamp = new Date(part.created_at * 1000).toLocaleString();
+      let bodyText = '';
+      
+      if (part.body) {
+        bodyText = part.body
+          .replace(/<[^>]*>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .trim();
+        
+        if (bodyText.length > 300) {
+          bodyText = `${bodyText.substring(0, 300)}...`;
+        }
+      }
+
+      return `**${author}** (${timestamp}):\n${bodyText || '_No content_'}`;
+    }).join('\n\n');
+
+    elements.push({
+      tag: 'div',
+      text: {
+        tag: 'lark_md',
+        content: `**💬 Recent Activity:**\n\n${conversationContent}`
+      }
+    });
+
+    if (sortedParts.length > 5) {
+      elements.push({
+        tag: 'note',
+        elements: [{
+          tag: 'plain_text',
+          content: `... and ${sortedParts.length - 5} more conversation parts`
+        }]
+      });
+    }
+  }
+
+  // Add metadata footer
+  elements.push({
+    tag: 'hr'
+  });
+
+  const footerElements = [];
+  
+  if (metadata.assignee) {
+    footerElements.push({
+      tag: 'plain_text',
+      content: `👤 Assigned to: ${metadata.assignee}`
+    });
+  }
+  
+  if (metadata.repliedBy) {
+    footerElements.push({
+      tag: 'plain_text',
+      content: `💬 Replied by: ${metadata.repliedBy}`
+    });
+  }
+  
+  if (metadata.noteBy) {
+    footerElements.push({
+      tag: 'plain_text',
+      content: `📝 Note by: ${metadata.noteBy}`
+    });
+  }
+
+  footerElements.push({
+    tag: 'plain_text',
+    content: `Updated: ${new Date(ticket.updated_at * 1000).toLocaleString()}`
+  });
+
+  elements.push({
+    tag: 'note',
+    elements: footerElements
+  });
+
+  // Add action button
+  elements.push({
+    tag: 'action',
+    actions: [{
+      tag: 'button',
+      text: {
+        tag: 'plain_text',
+        content: 'View in Intercom'
+      },
+      type: 'primary',
+      url: `https://app.intercom.io/a/apps/${process.env.INTERCOM_APP_ID}/inbox/conversation/${ticket.id}`
+    }]
+  });
+
+  // Create the card
+  return {
+    config: {
+      wide_screen_mode: true,
+      enable_forward: true
+    },
+    header: {
+      title: {
+        content: `${config.emoji} ${config.title}`,
+        tag: 'plain_text'
+      },
+      subtitle: {
+        content: `Ticket #${ticket.id}`,
+        tag: 'plain_text'
+      },
+      template: config.template
+    },
+    elements
+  };
 }
 
 /**
