@@ -128,24 +128,35 @@ You should see:
 4. Check your Lark chat group for notifications
 
 ### **4.3 Expected Lark Notifications**
-You should see messages like:
 
-```
-🆕 **Ticket Update**
+#### **Interactive Card Format (Default)**
+The system sends beautiful interactive cards with colored headers:
 
-**Ticket ID:** 12345
-**Status:** 🆕 SUBMITTED
-**Event:** OPENED
-**Subject:** Customer needs help with login
-**Created:** 2024-01-15 10:30:00
-**Updated:** 2024-01-15 10:30:00
+- **🆕 Blue Header**: New tickets and assignments
+- **💬 Turquoise Header**: Admin replies
+- **📝 Yellow Header**: Notes added
+- **✅ Green Header**: Closed tickets
+- **🔄 Orange Header**: Reopened tickets
 
-💬 **Recent Activity:**
-**Customer Name** (2024-01-15 10:30:00):
-I can't log into my account. Getting error message...
+The card includes:
+- Ticket state with visual indicators (🟢 open, 🔴 closed, 🟡 snoozed)
+- Express request status (⚡ EXPRESS or ⏱️ STANDARD)
+- Merchant details (name, country, contact, address)
+- Request description
+- Recent activity (last 5 conversation parts)
+- Metadata footer with timestamps and actions
 
-[View in Intercom](https://app.intercom.io/a/apps/your-app-id/inbox/conversation/12345)
-```
+#### **Site Inspection Filtering**
+**Important**: The system ONLY sends notifications for tickets with these "Onsite Request Type" values:
+- "👥 Site Inspection - New Merchant"
+- "👥 Site Inspection - Existing Merchant"
+
+All other L2 tickets (hardware troubleshooting, technical support, etc.) are automatically filtered out.
+
+#### **Message Character Limits**
+- **Card format**: Up to 1000 characters per conversation part
+- **Text format**: Up to 1500 characters per conversation part
+- Messages exceeding these limits are truncated with "..." indicator
 
 ## 🔧 **Step 5: Customization Options**
 

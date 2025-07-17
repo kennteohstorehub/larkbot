@@ -350,7 +350,7 @@ Copy and paste this entire command:
 ```json
 {
   "type": "app",
-  "id": "***REMOVED***",
+  "id": "v2axofpf",
   "name": "Your App Name",
   "created_at": 1234567890
 }
@@ -376,8 +376,8 @@ Create or edit `.env` in your project folder:
 
 ```bash
 # Intercom Configuration
-INTERCOM_TOKEN=***REMOVED***
-INTERCOM_APP_ID=***REMOVED***
+INTERCOM_TOKEN=dG9rOmVlMTEwNzY0XzRiNjlfNGRjZV84ZjdmXzVjNzI0M2NiYzliMzoxOjA=
+INTERCOM_APP_ID=v2axofpf
 
 # Application Configuration
 NODE_ENV=development
@@ -402,7 +402,7 @@ curl http://localhost:3001/api/test-connection
 {
   "status": "success",
   "message": "Connected to Intercom",
-  "app_id": "***REMOVED***"
+  "app_id": "v2axofpf"
 }
 ```
 
@@ -415,7 +415,7 @@ Go to: https://reqbin.com/
 - **Method**: GET
 - **URL**: `https://api.intercom.io/me`
 - **Headers**:
-  - `Authorization`: `Bearer ***REMOVED***`
+  - `Authorization`: `Bearer dG9rOmVlMTEwNzY0XzRiNjlfNGRjZV84ZjdmXzVjNzI0M2NiYzliMzoxOjA=`
   - `Accept`: `application/json`
 
 ### **Step 3: Click "Send"**
@@ -427,7 +427,7 @@ Once basic auth works, test data access:
 
 ```bash
 # Test conversations
-curl -X GET "https://api.intercom.io/conversations" -H "Authorization: Bearer ***REMOVED***" -H "Accept: application/json"
+curl -X GET "https://api.intercom.io/conversations" -H "Authorization: Bearer dG9rOmVlMTEwNzY0XzRiNjlfNGRjZV84ZjdmXzVjNzI0M2NiYzliMzoxOjA=" -H "Accept: application/json"
 ```
 
 ## 🎯 **What to Do Right Now:**

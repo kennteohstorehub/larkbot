@@ -294,13 +294,13 @@ npm install --save-dev nodemon jest
 # Create .env with your working credentials
 cat > .env << 'EOF'
 # Intercom Configuration - CONFIRMED WORKING
-INTERCOM_TOKEN=***REMOVED***
-INTERCOM_APP_ID=***REMOVED***
+INTERCOM_TOKEN=dG9rOmVlMTEwNzY0XzRiNjlfNGRjZV84ZjdmXzVjNzI0M2NiYzliMzoxOjA=
+INTERCOM_APP_ID=v2axofpf
 
 # Lark Suite Configuration - CONFIRMED WORKING
-LARK_APP_ID=***REMOVED***
-LARK_APP_SECRET=***REMOVED***
-LARK_WEBHOOK_SECRET=***REMOVED***
+LARK_APP_ID=cli_a8e56cf713799029
+LARK_APP_SECRET=px5bDXkMKmKuR1D64xUQoe4AezCU3y0U
+LARK_WEBHOOK_SECRET=4PJ8951qoPjSc7MIdGU8NggTRPE8Gfzk
 LARK_CHAT_GROUP_ID=oc_placeholder_for_now
 
 # Application Configuration
@@ -415,8 +415,8 @@ git commit -m "Complete Intercom-Lark bot setup
 ✅ Ready for deployment
 
 Credentials confirmed:
-- Intercom API: ***REMOVED***
-- Lark App: ***REMOVED***
+- Intercom API: v2axofpf
+- Lark App: cli_a8e56cf713799029
 - Webhook ready for approval"
 
 # Push to GitHub
@@ -495,8 +495,8 @@ git add .
 # Commit with your working setup
 git commit -m "Add complete Intercom-Lark bot project
 
-✅ Confirmed working Intercom credentials (***REMOVED***)
-✅ Confirmed working Lark credentials (***REMOVED***)
+✅ Confirmed working Intercom credentials (v2axofpf)
+✅ Confirmed working Lark credentials (cli_a8e56cf713799029)
 ✅ All source code and documentation
 ✅ Environment configuration
 ✅ Ready for deployment"

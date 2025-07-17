@@ -50,6 +50,22 @@ The **Intercom-Lark Automation System** is a comprehensive solution that automat
 - **As a** Manager, **I want to** track the complete ticket lifecycle **so that** I can monitor team performance
 - **As a** Developer, **I want to** webhook-driven updates **so that** the system responds instantly to changes
 
+#### **Phase 3 Implementation Details:**
+- **Interactive Card Format**: Beautiful card notifications with colored headers
+  - 🆕 Blue headers for new tickets and assignments
+  - 💬 Turquoise for replies
+  - 📝 Yellow for notes
+  - ✅ Green for closed tickets
+  - 🔄 Orange for reopened tickets
+- **Site Inspection Filtering**: Only captures tickets with specific "Onsite Request Type":
+  - "👥 Site Inspection - New Merchant"
+  - "👥 Site Inspection - Existing Merchant"
+  - All other L2 tickets (hardware troubleshooting, etc.) are ignored
+- **Enhanced Message Display**: 
+  - Card format supports up to 1000 characters
+  - Text format supports up to 1500 characters
+- **Multi-Group Support**: Can send to multiple Lark chat groups simultaneously
+
 #### Phase 4: Enhanced Lark Integration 🔄 **60% COMPLETE**
 - **As a** Team Lead, **I want to** tickets automatically created as Lark documents **so that** we can collaborate effectively
 - **As an** Analyst, **I want to** metrics updated in Lark sheets **so that** stakeholders have current data
