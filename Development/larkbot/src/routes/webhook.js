@@ -203,6 +203,7 @@ router.post('/intercom', async (req, res) => {
     // When type is "notification_event", use the topic field instead
     const eventType = type === 'notification_event' ? topic : (topic || type);
     
+    // DETAILED WEBHOOK PAYLOAD LOGGING
     logger.info('📧 Received Intercom webhook', { 
       type, 
       topic,
@@ -210,7 +211,9 @@ router.post('/intercom', async (req, res) => {
       ticketId: data?.item?.id || data?.conversation?.id,
       dataKeys: Object.keys(data || {}),
       hasItem: !!data?.item,
-      hasConversation: !!data?.conversation
+      hasConversation: !!data?.conversation,
+      // Log the complete payload structure for debugging
+      webhookPayload: JSON.stringify(req.body, null, 2)
     });
 
     // Log if this is being processed as L2 onsite
@@ -520,15 +523,39 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
     try {
       // Try to fetch full conversation data from Intercom
       const { intercomService } = require('../services');
-      logger.info('📡 Intercom service status', {
+      const healthStatus = intercomService?.getHealthStatus?.() || {};
+      
+      logger.info('📡 Intercom service status - DETAILED', {
         ticketId: ticket.id,
         serviceExists: !!intercomService,
         isInitialized: intercomService?.isInitialized,
-        healthStatus: intercomService?.getHealthStatus?.()
+        healthStatus,
+        environmentCheck: {
+          hasIntercomToken: !!process.env.INTERCOM_TOKEN,
+          tokenLength: process.env.INTERCOM_TOKEN?.length || 0,
+          hasAppId: !!process.env.INTERCOM_APP_ID,
+          nodeEnv: process.env.NODE_ENV
+        }
       });
 
       if (intercomService && intercomService.isInitialized) {
+        logger.info('🔄 Starting Intercom API call', {
+          ticketId: ticket.id,
+          apiEndpoint: `/conversations/${ticket.id}`
+        });
+        
         const fullConversation = await intercomService.getConversation(ticket.id);
+        
+        logger.info('📥 Intercom API response received', {
+          ticketId: ticket.id,
+          hasResponse: !!fullConversation,
+          responseKeys: fullConversation ? Object.keys(fullConversation) : [],
+          hasConversationParts: !!(fullConversation?.conversation_parts),
+          conversationPartsCount: fullConversation?.conversation_parts?.conversation_parts?.length || 0,
+          // Log the full response structure for debugging
+          apiResponse: fullConversation ? JSON.stringify(fullConversation, null, 2) : 'null'
+        });
+        
         if (fullConversation) {
           // Merge webhook data with API data, preferring API data for conversation_parts
           enrichedTicket = { 
@@ -542,7 +569,8 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
             ticketId: ticket.id,
             conversationPartsCount: enrichedTicket.conversation_parts?.conversation_parts?.length || 0,
             hasCustomAttributes: !!enrichedTicket.custom_attributes,
-            teamAssigneeId: enrichedTicket.team_assignee_id
+            teamAssigneeId: enrichedTicket.team_assignee_id,
+            mergedTicketKeys: Object.keys(enrichedTicket)
           });
         } else {
           logger.warn('⚠️ Intercom API returned empty conversation data', {
@@ -566,10 +594,24 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
     }
 
     // Get the configured Lark chat group IDs from environment
-    const chatGroups = [
+    const allGroups = [
       { name: 'MY/PH FE', id: process.env.LARK_CHAT_GROUP_ID_MYPHFE },
       { name: 'Complex Setup Process', id: process.env.LARK_CHAT_GROUP_ID_COMPLEX_SETUP }
-    ].filter((group) => group.id && group.id !== 'oc_placeholder_for_now' && group.id !== 'oc_myphfe_group_id' && group.id !== 'oc_complex_setup_group_id');
+    ];
+    
+    const chatGroups = allGroups.filter((group) => group.id && group.id !== 'oc_placeholder_for_now' && group.id !== 'oc_myphfe_group_id' && group.id !== 'oc_complex_setup_group_id');
+    
+    logger.info('🎯 Lark chat group configuration', {
+      ticketId: enrichedTicket.id,
+      allGroups: allGroups.map(g => ({ name: g.name, id: g.id, isPlaceholder: g.id === 'oc_placeholder_for_now' })),
+      filteredGroups: chatGroups.map(g => ({ name: g.name, id: g.id })),
+      filteredCount: chatGroups.length,
+      environmentVariables: {
+        LARK_CHAT_GROUP_ID_MYPHFE: process.env.LARK_CHAT_GROUP_ID_MYPHFE,
+        LARK_CHAT_GROUP_ID_COMPLEX_SETUP: process.env.LARK_CHAT_GROUP_ID_COMPLEX_SETUP,
+        LARK_CHAT_GROUP_ID: process.env.LARK_CHAT_GROUP_ID
+      }
+    });
 
     // FALLBACK: If no specific group IDs are configured, use the main LARK_CHAT_GROUP_ID
     if (chatGroups.length === 0) {
@@ -597,6 +639,14 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
 
     // Format the message for Lark using enriched ticket data
     const message = formatTicketUpdateMessage(enrichedTicket, eventType, metadata);
+    
+    logger.info('📝 Formatted Lark message', {
+      ticketId: enrichedTicket.id,
+      messageLength: message.length,
+      messagePreview: message.substring(0, 500) + (message.length > 500 ? '...' : ''),
+      // Log the full message for debugging
+      fullMessage: message
+    });
 
     // Send to all configured Lark groups
     const sendPromises = chatGroups.map(async (group) => {
