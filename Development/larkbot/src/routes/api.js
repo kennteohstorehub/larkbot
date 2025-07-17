@@ -5,6 +5,44 @@ const logger = require('../utils/logger');
 const router = express.Router();
 
 /**
+ * Debug endpoint to check environment variables
+ * GET /api/debug/env
+ */
+router.get('/debug/env', (req, res) => {
+  const envVars = {
+    LARK_CHAT_GROUP_ID: process.env.LARK_CHAT_GROUP_ID || 'NOT SET',
+    LARK_CHAT_GROUP_ID_MYPHFE: process.env.LARK_CHAT_GROUP_ID_MYPHFE || 'NOT SET',
+    LARK_CHAT_GROUP_ID_COMPLEX_SETUP: process.env.LARK_CHAT_GROUP_ID_COMPLEX_SETUP || 'NOT SET',
+    NODE_ENV: process.env.NODE_ENV || 'NOT SET'
+  };
+
+  const placeholders = ['oc_placeholder_for_now', 'oc_myphfe_group_id', 'oc_complex_setup_group_id'];
+  
+  const analysis = {
+    totalVars: Object.keys(envVars).length - 1,
+    configuredVars: Object.entries(envVars)
+      .filter(([key, value]) => key.startsWith('LARK_CHAT_GROUP_ID') && value !== 'NOT SET' && !placeholders.includes(value))
+      .map(([key, value]) => ({ key, value: value.substring(0, 10) + '...' })),
+    placeholderVars: Object.entries(envVars)
+      .filter(([key, value]) => placeholders.includes(value))
+      .map(([key]) => key)
+  };
+
+  res.json({
+    environment: envVars.NODE_ENV,
+    larkGroups: {
+      mainGroup: envVars.LARK_CHAT_GROUP_ID === 'NOT SET' ? 'NOT SET' : 
+                 placeholders.includes(envVars.LARK_CHAT_GROUP_ID) ? 'PLACEHOLDER' : 'CONFIGURED',
+      myphfeGroup: envVars.LARK_CHAT_GROUP_ID_MYPHFE === 'NOT SET' ? 'NOT SET' : 
+                   placeholders.includes(envVars.LARK_CHAT_GROUP_ID_MYPHFE) ? 'PLACEHOLDER' : 'CONFIGURED',
+      complexSetupGroup: envVars.LARK_CHAT_GROUP_ID_COMPLEX_SETUP === 'NOT SET' ? 'NOT SET' : 
+                         placeholders.includes(envVars.LARK_CHAT_GROUP_ID_COMPLEX_SETUP) ? 'PLACEHOLDER' : 'CONFIGURED'
+    },
+    analysis
+  });
+});
+
+/**
  * Get conversations with pagination
  * GET /api/conversations
  */
