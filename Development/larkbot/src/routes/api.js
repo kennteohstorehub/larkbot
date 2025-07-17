@@ -9,6 +9,10 @@ const router = express.Router();
  * GET /api/debug/env
  */
 router.get('/debug/env', (req, res) => {
+  const deploymentInfo = {
+    version: '2024-07-17-fix-v2',
+    deployedAt: new Date().toISOString()
+  };
   const envVars = {
     LARK_CHAT_GROUP_ID: process.env.LARK_CHAT_GROUP_ID || 'NOT SET',
     LARK_CHAT_GROUP_ID_MYPHFE: process.env.LARK_CHAT_GROUP_ID_MYPHFE || 'NOT SET',
@@ -29,6 +33,7 @@ router.get('/debug/env', (req, res) => {
   };
 
   res.json({
+    deploymentInfo,
     environment: envVars.NODE_ENV,
     larkGroups: {
       mainGroup: envVars.LARK_CHAT_GROUP_ID === 'NOT SET' ? 'NOT SET' : 
