@@ -147,14 +147,14 @@ class LarkService {
   async sendMessage(chatId, content, messageType = 'text') {
     logger.info('📤 Sending message to Lark chat', { chatId, messageType });
 
-    const messageData = {
-      receive_id: chatId,
-      msg_type: messageType,
-      content: JSON.stringify(content)
-    };
-
     try {
-      const response = await this.makeRequest('POST', this.endpoints.messages, messageData);
+      const response = await this.makeRequest('POST', this.endpoints.messages, {
+        receive_id: chatId,
+        msg_type: messageType,
+        content: JSON.stringify(content)
+      }, {
+        receive_id_type: 'chat_id'
+      });
 
       if (response.code === 0) {
         logger.info('✅ Message sent successfully', { messageId: response.data.message_id });
