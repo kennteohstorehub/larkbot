@@ -508,33 +508,61 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
       return;
     }
 
-    // ENHANCED: Fetch full conversation data if not included in webhook
+    // ENHANCED: Always try to fetch full conversation data from Intercom API
+    // Webhook payloads often don't include all conversation parts
     let enrichedTicket = ticket;
-    if (!ticket.conversation_parts || !ticket.conversation_parts.conversation_parts || ticket.conversation_parts.conversation_parts.length === 0) {
-      logger.info('🔄 Conversation parts missing in webhook, attempting to fetch from Intercom API', {
+    logger.info('🔄 Fetching full conversation data from Intercom API', {
+      ticketId: ticket.id,
+      eventType,
+      hasConversationPartsInWebhook: !!(ticket.conversation_parts && ticket.conversation_parts.conversation_parts && ticket.conversation_parts.conversation_parts.length > 0)
+    });
+
+    try {
+      // Try to fetch full conversation data from Intercom
+      const { intercomService } = require('../services');
+      logger.info('📡 Intercom service status', {
         ticketId: ticket.id,
-        eventType
+        serviceExists: !!intercomService,
+        isInitialized: intercomService?.isInitialized,
+        healthStatus: intercomService?.getHealthStatus?.()
       });
 
-      try {
-        // Try to fetch full conversation data from Intercom
-        const { intercomService } = require('../services');
-        if (intercomService && intercomService.isInitialized) {
-          const fullConversation = await intercomService.getConversation(ticket.id);
-          if (fullConversation && fullConversation.conversation_parts) {
-            enrichedTicket = { ...ticket, conversation_parts: fullConversation.conversation_parts };
-            logger.info('✅ Successfully fetched conversation parts from Intercom API', {
-              ticketId: ticket.id,
-              conversationPartsCount: fullConversation.conversation_parts.conversation_parts?.length || 0
-            });
-          }
+      if (intercomService && intercomService.isInitialized) {
+        const fullConversation = await intercomService.getConversation(ticket.id);
+        if (fullConversation) {
+          // Merge webhook data with API data, preferring API data for conversation_parts
+          enrichedTicket = { 
+            ...ticket, 
+            ...fullConversation,
+            // Keep webhook-specific metadata
+            team_assignee_id: ticket.team_assignee_id || fullConversation.team_assignee_id,
+            custom_attributes: ticket.custom_attributes || fullConversation.custom_attributes
+          };
+          logger.info('✅ Successfully fetched and merged conversation data from Intercom API', {
+            ticketId: ticket.id,
+            conversationPartsCount: enrichedTicket.conversation_parts?.conversation_parts?.length || 0,
+            hasCustomAttributes: !!enrichedTicket.custom_attributes,
+            teamAssigneeId: enrichedTicket.team_assignee_id
+          });
+        } else {
+          logger.warn('⚠️ Intercom API returned empty conversation data', {
+            ticketId: ticket.id
+          });
         }
-      } catch (fetchError) {
-        logger.warn('⚠️ Could not fetch conversation parts from Intercom API', {
+      } else {
+        logger.warn('⚠️ Intercom service not available for conversation fetching', {
           ticketId: ticket.id,
-          error: fetchError.message
+          serviceExists: !!intercomService,
+          isInitialized: intercomService?.isInitialized
         });
       }
+    } catch (fetchError) {
+      logger.error('❌ Failed to fetch conversation data from Intercom API', {
+        ticketId: ticket.id,
+        error: fetchError.message,
+        stack: fetchError.stack
+      });
+      // Continue with webhook data only
     }
 
     // Get the configured Lark chat group IDs from environment
@@ -741,30 +769,44 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
   }
 
   // Add conversation content and notes - ENHANCED
+  logger.info('🔍 Formatting conversation data', {
+    ticketId: ticket.id,
+    hasConversationParts: !!ticket.conversation_parts,
+    conversationPartsStructure: ticket.conversation_parts ? Object.keys(ticket.conversation_parts) : 'none',
+    partsCount: ticket.conversation_parts?.conversation_parts?.length || 0
+  });
+
   if (ticket.conversation_parts && ticket.conversation_parts.conversation_parts) {
     const parts = ticket.conversation_parts.conversation_parts;
 
     if (parts.length > 0) {
       message += '\n💬 **CONVERSATION & NOTES:**\n';
 
-      // Show ALL conversation parts instead of just 3
-      const allParts = parts.reverse(); // Show newest first
+      // Show conversation parts in chronological order (oldest first)
+      const sortedParts = [...parts].sort((a, b) => a.created_at - b.created_at);
+      
+      // Show most recent 10 parts to avoid message being too long
+      const recentParts = sortedParts.slice(-10);
 
-      allParts.forEach((part, index) => {
-        const author = part.author?.name || part.author?.email || 'Unknown';
-        const authorType = part.part_type || 'comment';
+      recentParts.forEach((part, index) => {
+        const author = part.author?.name || part.author?.email || part.author?.id || 'Unknown';
+        const authorType = part.part_type || part.type || 'comment';
         const timestamp = new Date(part.created_at * 1000).toLocaleString();
 
-        // Add type emoji
+        // Add type emoji with more types
         const typeEmoji = {
           comment: '💬',
           note: '📝',
           assignment: '👤',
           close: '🔒',
-          open: '🔓'
+          open: '🔓',
+          reply: '↩️',
+          user_comment: '👤',
+          admin_comment: '👨‍💼',
+          ticket_note: '📋'
         }[authorType] || '💬';
 
-        message += `\n${typeEmoji} **${author}** (${timestamp}):\n`;
+        message += `\n${typeEmoji} **${author}** (${authorType}, ${timestamp}):\n`;
 
         if (part.body) {
           // Clean and format the message body
@@ -775,11 +817,12 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
             .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
             .trim();
 
-          // Increased character limit from 300 to 500
-          if (bodyText.length > 500) {
-            bodyText = `${bodyText.substring(0, 500)}...`;
+          // Increased character limit from 300 to 700 for better context
+          if (bodyText.length > 700) {
+            bodyText = `${bodyText.substring(0, 700)}...`;
           }
 
           message += `${bodyText}\n`;
@@ -787,11 +830,15 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
           message += '_No content_\n';
         }
       });
+
+      if (sortedParts.length > 10) {
+        message += `\n_... and ${sortedParts.length - 10} more conversation parts_\n`;
+      }
     } else {
       message += '\n💬 **CONVERSATION & NOTES:**\n_No conversation content available_\n';
     }
   } else {
-    message += '\n💬 **CONVERSATION & NOTES:**\n_No conversation data in webhook payload_\n';
+    message += '\n💬 **CONVERSATION & NOTES:**\n_No conversation data available - check Intercom API connectivity_\n';
   }
 
   // Add metadata if available

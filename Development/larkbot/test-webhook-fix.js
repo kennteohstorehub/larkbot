@@ -17,7 +17,45 @@ const testPayloads = [
           created_at: Date.now() / 1000,
           updated_at: Date.now() / 1000,
           custom_attributes: {
-            ticket_type: 'L2 Onsite Support'
+            ticket_type: 'L2 Onsite Support',
+            'Express Request - 3 hours Onsite Request': 'Yes',
+            '🆔 Merchant Account Name': 'Test Merchant Store',
+            '🌎 Country': 'Malaysia',
+            'PIC Name': 'John Doe',
+            'PIC Contact Number': '+60123456789',
+            'FULL Store Address': '123 Test Street, Kuala Lumpur, Malaysia',
+            'Onsite request description': 'Need help setting up new POS terminal'
+          },
+          conversation_parts: {
+            conversation_parts: [
+              {
+                created_at: (Date.now() / 1000) - 3600,
+                author: {
+                  name: 'John Doe',
+                  email: 'john@teststore.com'
+                },
+                part_type: 'comment',
+                body: 'Hi, I need help setting up the new POS terminal at my store. The device is not connecting to our network properly.'
+              },
+              {
+                created_at: (Date.now() / 1000) - 1800,
+                author: {
+                  name: 'Support Agent',
+                  email: 'agent@company.com'
+                },
+                part_type: 'admin_comment',
+                body: 'Thank you for contacting us. I will arrange for a technician to visit your site for the POS setup. Please ensure someone is available at the store during business hours.'
+              },
+              {
+                created_at: (Date.now() / 1000) - 600,
+                author: {
+                  name: 'Support Agent',
+                  email: 'agent@company.com'
+                },
+                part_type: 'note',
+                body: 'Closing ticket - onsite visit completed successfully. POS terminal now working properly.'
+              }
+            ]
           }
         }
       }
