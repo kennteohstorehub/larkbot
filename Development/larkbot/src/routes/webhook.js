@@ -820,39 +820,24 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
   // Create card elements
   const elements = [];
 
-  // Basic ticket info section
-  const basicInfo = [];
-  
-  // Add state with color indicator
+  // Combine state and merchant details in one section to reduce space
   const stateColors = {
     open: '🟢',
     closed: '🔴',
     snoozed: '🟡'
   };
-  basicInfo.push({
-    tag: 'plain_text',
-    content: `${stateColors[ticket.state] || '⚪'} State: ${ticket.state || 'open'}`
-  });
-
-  // Express request status
+  
   const expressRequest = customAttrs['Express Request - 3 hours Onsite Request'];
   const isExpress = expressRequest && expressRequest.toLowerCase() === 'yes';
-  basicInfo.push({
-    tag: 'plain_text',
-    content: isExpress ? '⚡ EXPRESS (3 HOURS)' : '⏱️ STANDARD REQUEST'
-  });
-
-  elements.push({
-    tag: 'div',
-    fields: basicInfo
-  });
-
-  // Merchant details section
+  
+  // Merchant details with state and express status integrated
   elements.push({
     tag: 'div',
     text: {
       tag: 'lark_md',
-      content: `**Merchant Details:**
+      content: `${stateColors[ticket.state] || '⚪'} **State:** ${ticket.state || 'open'} | ${isExpress ? '⚡ EXPRESS (3 HOURS)' : '⏱️ STANDARD REQUEST'}
+
+**Merchant Details:**
 • **Name:** ${customAttrs['🆔 Merchant Account Name'] || 'Unknown'}
 • **Country:** ${customAttrs['🌎 Country'] || 'Unknown'}
 • **Contact:** ${customAttrs['PIC Name'] || 'Unknown'} - ${customAttrs['PIC Contact Number'] || 'Unknown'}
