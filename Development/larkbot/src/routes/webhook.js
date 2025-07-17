@@ -195,6 +195,14 @@ function extractTextFromPost(content) {
  * Handle Intercom webhook events
  * This is what processes ticket status changes from Intercom
  */
+router.get('/intercom/version', (req, res) => {
+  res.json({ 
+    version: '2025-07-17-v3',
+    message: 'Webhook handler with all fixes applied',
+    timestamp: new Date().toISOString()
+  });
+});
+
 router.post('/intercom', async (req, res) => {
   try {
     const { type, data, topic } = req.body;
@@ -211,9 +219,7 @@ router.post('/intercom', async (req, res) => {
       ticketId: data?.item?.id || data?.conversation?.id,
       dataKeys: Object.keys(data || {}),
       hasItem: !!data?.item,
-      hasConversation: !!data?.conversation,
-      // Log the complete payload structure for debugging
-      webhookPayload: JSON.stringify(req.body, null, 2)
+      hasConversation: !!data?.conversation
     });
 
     // Log if this is being processed as L2 onsite
