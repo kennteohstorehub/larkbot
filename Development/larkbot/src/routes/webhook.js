@@ -438,7 +438,7 @@ function isL2OnsiteSupport(ticket) {
     const customAttributes = ticket.custom_attributes || {};
 
     // Method 1: Check team assignee ID for L2 Onsite Support Team
-    if (ticket.team_assignee_id === '5372074') {
+    if (ticket.team_assignee_id === '5372074' || ticket.team_assignee_id === 5372074) {
       logger.info('✅ L2 onsite ticket detected by team assignment', { ticketId: ticket.id });
       return true;
     }
@@ -506,7 +506,7 @@ function isL2OnsiteSupport(ticket) {
       allCustomAttributes: Object.keys(customAttributes),
       hasConversationParts: !!ticket.conversation_parts,
       checkResults: {
-        teamMatch: ticket.team_assignee_id === '5372074',
+        teamMatch: ticket.team_assignee_id === '5372074' || ticket.team_assignee_id === 5372074,
         ticketTypeMatch: customAttributes.ticket_type === 'L2 Onsite Support',
         ticketCategoryMatch: ticketCategory === 'L2 Onsite Support',
         tier2Match: tier2SupportType && tier2SupportType.toLowerCase().includes('onsite'),
