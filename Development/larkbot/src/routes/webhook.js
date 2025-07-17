@@ -457,9 +457,18 @@ function isL2OnsiteSupport(ticket) {
     logger.info('❌ Not an L2 onsite support ticket', {
       ticketId: ticket.id,
       teamAssigneeId: ticket.team_assignee_id,
+      targetTeamId: '5372074',
       ticketType: customAttributes.ticket_type,
       tier2SupportType,
-      onsiteRequestType
+      onsiteRequestType,
+      allCustomAttributes: Object.keys(customAttributes),
+      hasConversationParts: !!ticket.conversation_parts,
+      checkResults: {
+        teamMatch: ticket.team_assignee_id === '5372074',
+        ticketTypeMatch: customAttributes.ticket_type === 'L2 Onsite Support',
+        tier2Match: tier2SupportType && tier2SupportType.includes('Onsite Services'),
+        onsiteMatch: onsiteRequestType && onsiteRequestType.includes('site inspection')
+      }
     });
 
     return false;
