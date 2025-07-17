@@ -451,14 +451,30 @@ function isL2OnsiteSupport(ticket) {
 
     // Method 3: Check custom attribute for Tier 2 Support Type
     const tier2SupportType = customAttributes['🔧Tier 2 Support Type'];
-    if (tier2SupportType && tier2SupportType.includes('Onsite Services')) {
+    if (tier2SupportType && (
+      tier2SupportType.includes('Onsite Services') ||
+      tier2SupportType.toLowerCase().includes('onsite')
+    )) {
       logger.info('✅ L2 onsite ticket detected by support type', { ticketId: ticket.id });
+      return true;
+    }
+    
+    // Method 3b: Check Ticket category for L2 Onsite
+    const ticketCategory = customAttributes['Ticket category'];
+    if (ticketCategory && (
+      ticketCategory === 'L2 Onsite Support' ||
+      ticketCategory.toLowerCase().includes('l2 onsite')
+    )) {
+      logger.info('✅ L2 onsite ticket detected by ticket category', { ticketId: ticket.id });
       return true;
     }
 
     // Method 4: Check for site inspection requests
     const onsiteRequestType = customAttributes['Onsite Request Type'];
-    if (onsiteRequestType && onsiteRequestType.includes('site inspection')) {
+    if (onsiteRequestType && (
+      onsiteRequestType.toLowerCase().includes('site inspection') || 
+      onsiteRequestType.includes('Site Inspection')
+    )) {
       logger.info('✅ L2 onsite ticket detected by onsite request type', { ticketId: ticket.id });
       return true;
     }
