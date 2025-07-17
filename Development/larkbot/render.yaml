@@ -2,6 +2,7 @@ services:
   - type: web
     name: larkbot-production
     env: node
+    rootDir: .
     buildCommand: npm ci
     startCommand: npm start
     plan: starter
