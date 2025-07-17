@@ -833,8 +833,8 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
           .replace(/&#39;/g, "'")
           .trim();
         
-        if (bodyText.length > 300) {
-          bodyText = `${bodyText.substring(0, 300)}...`;
+        if (bodyText.length > 1000) {
+          bodyText = `${bodyText.substring(0, 1000)}...`;
         }
       }
 
@@ -1041,9 +1041,9 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
             .replace(/&#39;/g, "'")
             .trim();
 
-          // Increased character limit from 300 to 700 for better context
-          if (bodyText.length > 700) {
-            bodyText = `${bodyText.substring(0, 700)}...`;
+          // Increased character limit to show full context
+          if (bodyText.length > 1500) {
+            bodyText = `${bodyText.substring(0, 1500)}...`;
           }
 
           message += `${bodyText}\n`;
