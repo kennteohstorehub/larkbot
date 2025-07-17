@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intercom-Lark Automation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #fff;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .status-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #27ae60;
+        }
+        
+        .endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .endpoint-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .endpoint-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .endpoint-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .endpoint-card p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+        
+        .endpoint-card a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .endpoint-card a:hover {
+            background: #2980b9;
+        }
+        
+        .features {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        
+        .features h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .feature-item {
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            background: #ecf0f1;
+        }
+        
+        .docs-link {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .docs-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .docs-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Intercom-Lark Automation System</h1>
+            <p class="subtitle">Real-time ticket automation and data synchronization</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="status-card">
+            <h2><span class="status-indicator status-online"></span>System Status</h2>
+            <p>The automation service is running. Check the health endpoint for detailed status.</p>
+        </div>
+        
+        <div class="endpoints">
+            <div class="endpoint-card">
+                <h3>Health Check</h3>
+                <p>Monitor system health and service availability</p>
+                <a href="/health">Check Health</a>
+            </div>
+            
+            <div class="endpoint-card">
+                <h3>API Documentation</h3>
+                <p>Access conversation and ticket data via REST API</p>
+                <a href="/api">View API</a>
+            </div>
+            
+            <div class="endpoint-card">
+                <h3>Export Data</h3>
+                <p>Export conversations and tickets in JSON or CSV format</p>
+                <a href="/export">Export Options</a>
+            </div>
+            
+            <div class="endpoint-card">
+                <h3>Webhook Status</h3>
+                <p>View webhook configuration and recent events</p>
+                <a href="/webhook">Webhook Info</a>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>Key Features</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>Real-time Sync:</strong> Automatic ticket status updates
+                </div>
+                <div class="feature-item">
+                    <strong>Smart Filtering:</strong> 9 different filter types
+                </div>
+                <div class="feature-item">
+                    <strong>Lark Integration:</strong> Direct chat notifications
+                </div>
+                <div class="feature-item">
+                    <strong>Data Export:</strong> JSON and CSV formats
+                </div>
+                <div class="feature-item">
+                    <strong>Webhook Support:</strong> Event-driven automation
+                </div>
+                <div class="feature-item">
+                    <strong>Rate Limiting:</strong> Intelligent API management
+                </div>
+            </div>
+        </div>
+        
+        <div class="docs-link">
+            <p>For detailed documentation and setup instructions, see the <a href="https://github.com/your-repo/larkbot">GitHub Repository</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-refresh health status
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                const statusIndicator = document.querySelector('.status-indicator');
+                if (data.status === 'healthy') {
+                    statusIndicator.classList.add('status-online');
+                    statusIndicator.classList.remove('status-offline');
+                } else {
+                    statusIndicator.classList.remove('status-online');
+                    statusIndicator.classList.add('status-offline');
+                }
+            } catch (error) {
+                console.error('Health check failed:', error);
+            }
+        }
+        
+        // Check health on load and every 30 seconds
+        checkHealth();
+        setInterval(checkHealth, 30000);
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 const config = require('./config');
 const logger = require('./utils/logger');
 const { setupRoutes } = require('./routes');
@@ -24,7 +25,7 @@ class Application {
     try {
       // Validate configuration
       config.validateConfig();
-      
+
       logger.info(`Starting ${config.app.name} v${config.app.version}`);
       logger.info(`Environment: ${config.app.environment}`);
       logger.info(`Current Phase: ${config.getCurrentPhase()}`);
@@ -54,7 +55,7 @@ class Application {
   setupMiddleware() {
     // Security middleware
     this.app.use(helmet());
-    
+
     // CORS configuration
     this.app.use(cors({
       origin: config.isDevelopment() ? true : [], // Configure for production
@@ -64,6 +65,9 @@ class Application {
     // Body parsing
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+    // Serve static files
+    this.app.use(express.static(path.join(__dirname, '..', 'public')));
 
     // Request logging
     this.app.use((req, res, next) => {
@@ -90,7 +94,7 @@ class Application {
     // Global error handler
     this.app.use((err, req, res, next) => {
       logger.error('Unhandled error:', err);
-      
+
       const isDev = config.isDevelopment();
       res.status(err.status || 500).json({
         error: err.message || 'Internal Server Error',
@@ -113,7 +117,6 @@ class Application {
 
       // Setup graceful shutdown
       this.setupGracefulShutdown();
-
     } catch (error) {
       logger.error('Failed to start server:', error);
       process.exit(1);
@@ -170,4 +173,4 @@ if (require.main === module) {
   app.start();
 }
 
-module.exports = Application; 
+module.exports = Application;
