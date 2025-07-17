@@ -51,21 +51,21 @@ class Phase1Implementation {
    */
   async testConnection() {
     console.log('🔗 Step 1: Testing Intercom API connection...');
-    
+
     try {
       const connectionInfo = await intercomService.testConnection();
-      
+
       console.log('✅ Connection successful!');
       console.log(`   Admin Name: ${connectionInfo.name}`);
       console.log(`   Admin Email: ${connectionInfo.email}`);
       console.log(`   Admin ID: ${connectionInfo.id}\n`);
-      
+
       // Check rate limit
       const rateLimitInfo = intercomService.getRateLimitInfo();
       console.log('📊 Rate Limit Status:');
       console.log(`   Remaining: ${rateLimitInfo.remaining} requests`);
       console.log(`   Reset Time: ${rateLimitInfo.resetTime ? new Date(rateLimitInfo.resetTime).toLocaleString() : 'N/A'}\n`);
-      
+
       return connectionInfo;
     } catch (error) {
       console.error('❌ Connection failed:', error.message);
@@ -78,25 +78,25 @@ class Phase1Implementation {
    */
   async extractSampleData() {
     console.log('📥 Step 2: Extracting sample data...');
-    
+
     try {
       // Extract conversations
       console.log('   → Extracting conversations...');
       const conversationsResult = await intercomService.getConversations({ perPage: 10 });
       console.log(`   ✅ Retrieved ${conversationsResult.conversations.length} conversations`);
-      
+
       // Extract tickets
       console.log('   → Extracting tickets...');
       const ticketsResult = await intercomService.getTickets({ perPage: 10 });
       console.log(`   ✅ Retrieved ${ticketsResult.tickets.length} tickets`);
-      
+
       // Extract contacts
       console.log('   → Extracting contacts...');
       const contactsResult = await intercomService.getContacts({ perPage: 10 });
       console.log(`   ✅ Retrieved ${contactsResult.contacts.length} contacts`);
-      
+
       console.log('');
-      
+
       return {
         conversations: conversationsResult.conversations,
         tickets: ticketsResult.tickets,
@@ -113,33 +113,33 @@ class Phase1Implementation {
    */
   async testExportFunctionality() {
     console.log('📤 Step 3: Testing export functionality...');
-    
+
     try {
       // Get sample data
       const conversations = await intercomService.getAllConversations({ limit: 25 });
-      
+
       if (conversations.length === 0) {
         console.log('   ⚠️  No conversations found to export');
         return;
       }
-      
+
       // Test JSON export
       console.log('   → Testing JSON export...');
       const jsonFile = await exportService.exportConversations(conversations, 'json');
       console.log(`   ✅ JSON export successful: ${jsonFile.split('/').pop()}`);
-      
+
       // Test CSV export
       console.log('   → Testing CSV export...');
       const csvFile = await exportService.exportConversations(conversations, 'csv');
       console.log(`   ✅ CSV export successful: ${csvFile.split('/').pop()}`);
-      
+
       // List exported files
       console.log('   → Listing exported files...');
       const files = await exportService.listExportedFiles();
       console.log(`   ✅ Total exported files: ${files.length}`);
-      
+
       console.log('');
-      
+
       return { jsonFile, csvFile, totalFiles: files.length };
     } catch (error) {
       console.error('❌ Export functionality test failed:', error.message);
@@ -152,13 +152,13 @@ class Phase1Implementation {
    */
   async generateSummaryReport() {
     console.log('📊 Step 4: Generating summary report...');
-    
+
     try {
       // Gather system information
       const healthStatus = require('../../services').getHealthStatus();
       const rateLimitInfo = intercomService.getRateLimitInfo();
       const exportedFiles = await exportService.listExportedFiles();
-      
+
       // Generate report
       const report = {
         phase: 'Phase 1',
@@ -193,26 +193,26 @@ class Phase1Implementation {
           '⚡ Optimize performance for larger datasets'
         ]
       };
-      
+
       // Save report
       const reportFile = await exportService.exportToJSON(report, 'phase1_completion_report');
-      
+
       // Display summary
       console.log('\n📋 PHASE 1 SUMMARY REPORT');
       console.log('========================');
       console.log(`Status: ${report.status}`);
       console.log(`Completed At: ${new Date(report.completedAt).toLocaleString()}`);
       console.log(`Report Saved: ${reportFile.split('/').pop()}`);
-      
+
       console.log('\n🎯 Achievements:');
-      report.achievements.forEach(achievement => console.log(`   ${achievement}`));
-      
+      report.achievements.forEach((achievement) => console.log(`   ${achievement}`));
+
       console.log('\n🚀 Next Steps:');
-      report.nextSteps.forEach(step => console.log(`   ${step}`));
-      
+      report.nextSteps.forEach((step) => console.log(`   ${step}`));
+
       console.log('\n💡 Phase 1 Goals Completed:');
-      this.goals.forEach(goal => console.log(`   ✅ ${goal}`));
-      
+      this.goals.forEach((goal) => console.log(`   ✅ ${goal}`));
+
       return report;
     } catch (error) {
       console.error('❌ Summary report generation failed:', error.message);
@@ -226,28 +226,27 @@ class Phase1Implementation {
   async runDemo() {
     console.log('\n🎬 PHASE 1 DEMO MODE');
     console.log('===================\n');
-    
+
     try {
       // Quick connection test
       console.log('🔗 Testing connection...');
       await intercomService.testConnection();
       console.log('✅ Connection OK\n');
-      
+
       // Quick data sample
       console.log('📥 Fetching sample data...');
       const sample = await intercomService.getConversations({ perPage: 5 });
       console.log(`✅ Found ${sample.conversations.length} conversations\n`);
-      
+
       // Quick export test
       if (sample.conversations.length > 0) {
         console.log('📤 Testing export...');
         const exportFile = await exportService.exportConversations(sample.conversations, 'json');
         console.log(`✅ Export successful: ${exportFile.split('/').pop()}\n`);
       }
-      
+
       console.log('🎉 Demo completed successfully!');
       console.log('Ready to proceed with full Phase 1 implementation.\n');
-      
     } catch (error) {
       console.error('❌ Demo failed:', error.message);
       throw error;
@@ -261,25 +260,24 @@ if (require.main === module) {
     try {
       // Initialize services
       await require('../../services').initializeServices();
-      
+
       const phase1 = new Phase1Implementation();
-      
+
       // Check if demo mode is requested
       const isDemo = process.argv.includes('--demo');
-      
+
       if (isDemo) {
         await phase1.runDemo();
       } else {
         await phase1.run();
       }
-      
     } catch (error) {
       console.error('Phase 1 execution failed:', error.message);
       process.exit(1);
     }
   };
-  
+
   main();
 }
 
-module.exports = Phase1Implementation; 
+module.exports = Phase1Implementation;

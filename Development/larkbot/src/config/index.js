@@ -115,7 +115,7 @@ function validateConfig() {
 
   const missing = [];
 
-  required.forEach(key => {
+  required.forEach((key) => {
     const value = key.split('.').reduce((obj, prop) => obj?.[prop], config);
     if (!value) {
       missing.push(key);
@@ -171,4 +171,4 @@ module.exports = {
   isDevelopment,
   isProduction,
   getCurrentPhase
-}; 
+};

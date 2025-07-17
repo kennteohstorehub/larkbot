@@ -78,7 +78,7 @@ class ServicesManager {
    */
   async cleanup() {
     logger.info('Cleaning up services...');
-    
+
     // Add cleanup logic for each service if needed
     for (const [name, service] of Object.entries(this.services)) {
       try {
@@ -100,8 +100,8 @@ module.exports = {
   getHealthStatus: () => servicesManager.getHealthStatus(),
   getService: (name) => servicesManager.getService(name),
   cleanup: () => servicesManager.cleanup(),
-  
+
   // Direct service exports for convenience
   intercomService: servicesManager.services.intercom,
   exportService: servicesManager.services.export
-}; 
+};

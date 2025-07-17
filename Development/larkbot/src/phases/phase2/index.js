@@ -1,10 +1,10 @@
+const path = require('path');
 const { intercomService, exportService } = require('../../services');
 const logger = require('../../utils/logger');
-const path = require('path');
 
 /**
  * Phase 2: Advanced Filtering & Data Processing
- * 
+ *
  * This phase focuses on:
  * - Advanced filtering mechanisms
  * - Data transformation pipelines
@@ -25,20 +25,20 @@ class Phase2Implementation {
    */
   async initialize() {
     logger.info('🔍 Initializing Phase 2: Advanced Filtering & Data Processing');
-    
+
     // Initialize services
     await intercomService.initialize();
     await exportService.initialize();
-    
+
     // Setup default filters
     this.setupDefaultFilters();
-    
+
     // Setup data processors
     this.setupDataProcessors();
-    
+
     // Setup categorization rules
     this.setupCategorizationRules();
-    
+
     logger.info('✅ Phase 2 initialized successfully');
   }
 
@@ -52,8 +52,8 @@ class Phase2Implementation {
       description: 'Filter conversations by priority level',
       apply: (data, criteria) => {
         const { priority } = criteria;
-        return data.filter(item => 
-          item.priority === priority || 
+        return data.filter((item) =>
+          item.priority === priority ||
           (item.ticket_attributes && item.ticket_attributes.priority === priority)
         );
       }
@@ -67,8 +67,8 @@ class Phase2Implementation {
         const { startDate, endDate, field = 'created_at' } = criteria;
         const start = new Date(startDate).getTime();
         const end = new Date(endDate).getTime();
-        
-        return data.filter(item => {
+
+        return data.filter((item) => {
           const itemDate = new Date(item[field]).getTime();
           return itemDate >= start && itemDate <= end;
         });
@@ -81,8 +81,8 @@ class Phase2Implementation {
       description: 'Filter by conversation or ticket state',
       apply: (data, criteria) => {
         const { states } = criteria;
-        return data.filter(item => 
-          states.includes(item.state) || 
+        return data.filter((item) =>
+          states.includes(item.state) ||
           (item.ticket_attributes && states.includes(item.ticket_attributes.state))
         );
       }
@@ -94,15 +94,14 @@ class Phase2Implementation {
       description: 'Filter by tags',
       apply: (data, criteria) => {
         const { tags, mode = 'any' } = criteria; // 'any' or 'all'
-        
-        return data.filter(item => {
-          const itemTags = item.tags?.tags?.map(tag => tag.name) || [];
-          
+
+        return data.filter((item) => {
+          const itemTags = item.tags?.tags?.map((tag) => tag.name) || [];
+
           if (mode === 'all') {
-            return tags.every(tag => itemTags.includes(tag));
-          } else {
-            return tags.some(tag => itemTags.includes(tag));
+            return tags.every((tag) => itemTags.includes(tag));
           }
+          return tags.some((tag) => itemTags.includes(tag));
         });
       }
     });
@@ -113,11 +112,11 @@ class Phase2Implementation {
       description: 'Filter by assigned team member',
       apply: (data, criteria) => {
         const { assigneeIds, includeUnassigned = false } = criteria;
-        
-        return data.filter(item => {
+
+        return data.filter((item) => {
           if (!item.assignee && includeUnassigned) return true;
           if (!item.assignee) return false;
-          
+
           return assigneeIds.includes(item.assignee.id);
         });
       }
@@ -129,20 +128,20 @@ class Phase2Implementation {
       description: 'Filter by customer attributes',
       apply: (data, criteria) => {
         const { email, name, customAttributes } = criteria;
-        
-        return data.filter(item => {
+
+        return data.filter((item) => {
           const contacts = item.contacts?.contacts || [];
-          
-          return contacts.some(contact => {
+
+          return contacts.some((contact) => {
             if (email && contact.email && contact.email.includes(email)) return true;
             if (name && contact.name && contact.name.includes(name)) return true;
-            
+
             if (customAttributes) {
               for (const [key, value] of Object.entries(customAttributes)) {
                 if (contact.custom_attributes?.[key] === value) return true;
               }
             }
-            
+
             return false;
           });
         });
@@ -155,25 +154,24 @@ class Phase2Implementation {
       description: 'Filter by ticket custom data attributes',
       apply: (data, criteria) => {
         const { attributes, matchMode = 'any' } = criteria; // 'any' or 'all'
-        
-        return data.filter(item => {
+
+        return data.filter((item) => {
           const ticketAttributes = item.custom_attributes || {};
           const contactAttributes = item.contacts?.contacts?.[0]?.custom_attributes || {};
           const allAttributes = { ...ticketAttributes, ...contactAttributes };
-          
+
           const matches = Object.entries(attributes).map(([key, expectedValue]) => {
             const actualValue = allAttributes[key];
-            
+
             // Support different comparison modes
             if (Array.isArray(expectedValue)) {
               return expectedValue.includes(actualValue);
-            } else if (typeof expectedValue === 'object' && expectedValue.operator) {
+            } if (typeof expectedValue === 'object' && expectedValue.operator) {
               return this.compareValues(actualValue, expectedValue.value, expectedValue.operator);
-            } else {
-              return actualValue === expectedValue;
             }
+            return actualValue === expectedValue;
           });
-          
+
           return matchMode === 'all' ? matches.every(Boolean) : matches.some(Boolean);
         });
       }
@@ -185,26 +183,26 @@ class Phase2Implementation {
       description: 'Filter by specific ticket types or categories',
       apply: (data, criteria) => {
         const { types, categories, sources } = criteria;
-        
-        return data.filter(item => {
+
+        return data.filter((item) => {
           // Check ticket type
           if (types && types.length > 0) {
             const ticketType = item.ticket_attributes?.type || item.type;
             if (!types.includes(ticketType)) return false;
           }
-          
+
           // Check category
           if (categories && categories.length > 0) {
             const category = item.ticket_attributes?.category || item.category;
             if (!categories.includes(category)) return false;
           }
-          
+
           // Check source
           if (sources && sources.length > 0) {
             const source = item.source?.type || item.ticket_attributes?.source;
             if (!sources.includes(source)) return false;
           }
-          
+
           return true;
         });
       }
@@ -216,12 +214,12 @@ class Phase2Implementation {
       description: 'Combine multiple filter conditions with AND/OR logic',
       apply: (data, criteria) => {
         const { conditions, logic = 'AND' } = criteria;
-        
-        return data.filter(item => {
-          const results = conditions.map(condition => {
+
+        return data.filter((item) => {
+          const results = conditions.map((condition) => {
             const filter = this.filters.get(condition.filter);
             if (!filter) return false;
-            
+
             try {
               const filtered = filter.apply([item], condition.criteria);
               return filtered.length > 0;
@@ -230,7 +228,7 @@ class Phase2Implementation {
               return false;
             }
           });
-          
+
           return logic === 'OR' ? results.some(Boolean) : results.every(Boolean);
         });
       }
@@ -277,58 +275,52 @@ class Phase2Implementation {
     this.processors.set('enrichConversations', {
       name: 'Conversation Enricher',
       description: 'Enrich conversations with additional computed fields',
-      process: (conversations) => {
-        return conversations.map(conv => ({
-          ...conv,
-          // Add computed fields
-          responseTime: this.calculateResponseTime(conv),
-          sentiment: this.analyzeSentiment(conv),
-          complexity: this.assessComplexity(conv),
-          customerType: this.classifyCustomer(conv),
-          urgencyScore: this.calculateUrgencyScore(conv),
-          // Add metadata
-          processed_at: new Date().toISOString(),
-          processing_version: '2.0'
-        }));
-      }
+      process: (conversations) => conversations.map((conv) => ({
+        ...conv,
+        // Add computed fields
+        responseTime: this.calculateResponseTime(conv),
+        sentiment: this.analyzeSentiment(conv),
+        complexity: this.assessComplexity(conv),
+        customerType: this.classifyCustomer(conv),
+        urgencyScore: this.calculateUrgencyScore(conv),
+        // Add metadata
+        processed_at: new Date().toISOString(),
+        processing_version: '2.0'
+      }))
     });
 
     // Ticket analysis
     this.processors.set('analyzeTickets', {
       name: 'Ticket Analyzer',
       description: 'Analyze tickets for patterns and insights',
-      process: (tickets) => {
-        return tickets.map(ticket => ({
-          ...ticket,
-          // Analysis fields
-          resolutionTime: this.calculateResolutionTime(ticket),
-          escalationRisk: this.assessEscalationRisk(ticket),
-          similarTickets: this.findSimilarTickets(ticket, tickets),
-          automationPotential: this.assessAutomationPotential(ticket),
-          // Add metadata
-          analyzed_at: new Date().toISOString(),
-          analysis_version: '2.0'
-        }));
-      }
+      process: (tickets) => tickets.map((ticket) => ({
+        ...ticket,
+        // Analysis fields
+        resolutionTime: this.calculateResolutionTime(ticket),
+        escalationRisk: this.assessEscalationRisk(ticket),
+        similarTickets: this.findSimilarTickets(ticket, tickets),
+        automationPotential: this.assessAutomationPotential(ticket),
+        // Add metadata
+        analyzed_at: new Date().toISOString(),
+        analysis_version: '2.0'
+      }))
     });
 
     // Contact enhancement
     this.processors.set('enhanceContacts', {
       name: 'Contact Enhancer',
       description: 'Enhance contacts with behavioral insights',
-      process: (contacts) => {
-        return contacts.map(contact => ({
-          ...contact,
-          // Behavioral insights
-          engagementLevel: this.calculateEngagementLevel(contact),
-          supportHistory: this.analyzeSupportHistory(contact),
-          riskLevel: this.assessCustomerRisk(contact),
-          valueScore: this.calculateCustomerValue(contact),
-          // Add metadata
-          enhanced_at: new Date().toISOString(),
-          enhancement_version: '2.0'
-        }));
-      }
+      process: (contacts) => contacts.map((contact) => ({
+        ...contact,
+        // Behavioral insights
+        engagementLevel: this.calculateEngagementLevel(contact),
+        supportHistory: this.analyzeSupportHistory(contact),
+        riskLevel: this.assessCustomerRisk(contact),
+        valueScore: this.calculateCustomerValue(contact),
+        // Add metadata
+        enhanced_at: new Date().toISOString(),
+        enhancement_version: '2.0'
+      }))
     });
 
     logger.info(`✅ Loaded ${this.processors.size} data processors`);
@@ -344,7 +336,7 @@ class Phase2Implementation {
       condition: (item) => {
         const text = this.extractText(item).toLowerCase();
         const technicalKeywords = ['bug', 'error', 'crash', 'broken', 'api', 'integration', 'technical'];
-        return technicalKeywords.some(keyword => text.includes(keyword));
+        return technicalKeywords.some((keyword) => text.includes(keyword));
       },
       category: 'technical',
       priority: 'high',
@@ -357,7 +349,7 @@ class Phase2Implementation {
       condition: (item) => {
         const text = this.extractText(item).toLowerCase();
         const billingKeywords = ['payment', 'billing', 'invoice', 'charge', 'refund', 'subscription'];
-        return billingKeywords.some(keyword => text.includes(keyword));
+        return billingKeywords.some((keyword) => text.includes(keyword));
       },
       category: 'billing',
       priority: 'medium',
@@ -370,7 +362,7 @@ class Phase2Implementation {
       condition: (item) => {
         const text = this.extractText(item).toLowerCase();
         const featureKeywords = ['feature', 'request', 'enhancement', 'improvement', 'suggestion'];
-        return featureKeywords.some(keyword => text.includes(keyword));
+        return featureKeywords.some((keyword) => text.includes(keyword));
       },
       category: 'feature_request',
       priority: 'low',
@@ -383,7 +375,7 @@ class Phase2Implementation {
       condition: (item) => {
         const text = this.extractText(item).toLowerCase();
         const urgentKeywords = ['urgent', 'critical', 'emergency', 'asap', 'immediately'];
-        return urgentKeywords.some(keyword => text.includes(keyword));
+        return urgentKeywords.some((keyword) => text.includes(keyword));
       },
       category: 'urgent',
       priority: 'urgent',
@@ -397,7 +389,7 @@ class Phase2Implementation {
    * Apply multiple filters to data
    */
   async applyFilters(data, filterCriteria) {
-    logger.info('🔍 Applying filters to data', { 
+    logger.info('🔍 Applying filters to data', {
       dataCount: data.length,
       filters: Object.keys(filterCriteria)
     });
@@ -471,7 +463,7 @@ class Phase2Implementation {
   async categorizeData(data) {
     logger.info('🏷️ Categorizing data using rules', { dataCount: data.length });
 
-    const categorizedData = data.map(item => {
+    const categorizedData = data.map((item) => {
       const categories = [];
       const suggestedTags = [];
       let suggestedPriority = item.priority;
@@ -481,7 +473,7 @@ class Phase2Implementation {
         if (rule.condition(item)) {
           categories.push(rule.category);
           suggestedTags.push(...rule.tags);
-          
+
           // Update priority if rule suggests higher priority
           if (this.isPriorityHigher(rule.priority, suggestedPriority)) {
             suggestedPriority = rule.priority;
@@ -501,8 +493,8 @@ class Phase2Implementation {
 
     // Log categorization summary
     const categoryStats = {};
-    categorizedData.forEach(item => {
-      item.auto_categories.forEach(category => {
+    categorizedData.forEach((item) => {
+      item.auto_categories.forEach((category) => {
         categoryStats[category] = (categoryStats[category] || 0) + 1;
       });
     });
@@ -530,7 +522,7 @@ class Phase2Implementation {
       logger.info('📊 Step 1: Extracting data...');
       const conversations = await intercomService.getConversations({ page: 1, perPage: limit });
       const tickets = await intercomService.getTickets({ page: 1, perPage: limit });
-      
+
       // Step 2: Apply filters
       logger.info('🔍 Step 2: Applying filters...');
       const conversationFilterResult = await this.applyFilters(conversations.conversations, filters);
@@ -551,13 +543,13 @@ class Phase2Implementation {
       // Step 5: Export results
       logger.info('📤 Step 5: Exporting results...');
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      
+
       const conversationFile = await exportService.exportConversations(
         categorizedConversations,
         export_format,
         `phase2_conversations_${timestamp}`
       );
-      
+
       const ticketFile = await exportService.exportTickets(
         categorizedTickets,
         export_format,
@@ -590,7 +582,6 @@ class Phase2Implementation {
         },
         summary
       };
-
     } catch (error) {
       logger.error('❌ Phase 2 failed', { error: error.message });
       throw error;
@@ -638,7 +629,7 @@ class Phase2Implementation {
 
   findSimilarTickets(ticket, allTickets) {
     // Mock similar ticket finder
-    return allTickets.slice(0, 3).map(t => t.id);
+    return allTickets.slice(0, 3).map((t) => t.id);
   }
 
   assessAutomationPotential(ticket) {
@@ -686,7 +677,7 @@ class Phase2Implementation {
 
   generateSummary(data) {
     const { conversations, tickets, filters, processors } = data;
-    
+
     return {
       timestamp: new Date().toISOString(),
       phase: 'Phase 2',
@@ -714,8 +705,8 @@ class Phase2Implementation {
 
   countCategories(items) {
     const counts = {};
-    items.forEach(item => {
-      item.auto_categories?.forEach(category => {
+    items.forEach((item) => {
+      item.auto_categories?.forEach((category) => {
         counts[category] = (counts[category] || 0) + 1;
       });
     });
@@ -724,7 +715,7 @@ class Phase2Implementation {
 
   countPriorities(items) {
     const counts = {};
-    items.forEach(item => {
+    items.forEach((item) => {
       const priority = item.suggested_priority || item.priority || 'unknown';
       counts[priority] = (counts[priority] || 0) + 1;
     });
@@ -733,17 +724,17 @@ class Phase2Implementation {
 
   getMostCommonCategory(items) {
     const counts = this.countCategories(items);
-    return Object.entries(counts).sort(([,a], [,b]) => b - a)[0]?.[0] || 'none';
+    return Object.entries(counts).sort(([, a], [, b]) => b - a)[0]?.[0] || 'none';
   }
 
   getAverageUrgencyScore(conversations) {
-    const scores = conversations.map(c => c.urgencyScore || 0);
+    const scores = conversations.map((c) => c.urgencyScore || 0);
     return scores.reduce((a, b) => a + b, 0) / scores.length;
   }
 
   countHighRiskItems(items) {
-    return items.filter(item => 
-      item.escalationRisk === 'high' || 
+    return items.filter((item) =>
+      item.escalationRisk === 'high' ||
       item.riskLevel === 'high' ||
       item.urgencyScore > 7
     ).length;
@@ -757,10 +748,10 @@ const phase2 = new Phase2Implementation();
 async function main() {
   const args = process.argv.slice(2);
   const demo = args.includes('--demo');
-  
+
   try {
     await phase2.initialize();
-    
+
     // Example filter configuration
     const filters = {
       // dateRange: {
@@ -771,7 +762,7 @@ async function main() {
       // priority: { priority: 'high' },
       // state: { states: ['open', 'pending'] }
     };
-    
+
     const result = await phase2.run({
       demo,
       filters,
@@ -779,7 +770,7 @@ async function main() {
       export_format: 'json',
       limit: demo ? 10 : 50
     });
-    
+
     console.log('\n🎉 Phase 2 Results:');
     console.log('==================');
     console.log(`✅ Processed ${result.data.conversations.length} conversations`);
@@ -787,7 +778,6 @@ async function main() {
     console.log(`📁 Exported to: ${result.exports.conversations}`);
     console.log(`📁 Exported to: ${result.exports.tickets}`);
     console.log('\n📊 Summary:', JSON.stringify(result.summary, null, 2));
-    
   } catch (error) {
     console.error('❌ Phase 2 failed:', error.message);
     process.exit(1);
@@ -798,4 +788,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = phase2; 
+module.exports = phase2;

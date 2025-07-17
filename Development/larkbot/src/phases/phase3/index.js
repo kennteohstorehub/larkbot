@@ -3,7 +3,7 @@ const logger = require('../../utils/logger');
 
 /**
  * Phase 3: Real-time Automation
- * 
+ *
  * This phase handles real-time webhook processing and notification delivery
  * Features:
  * - Webhook event processing
@@ -31,19 +31,19 @@ class Phase3Implementation {
   async initialize() {
     try {
       logger.info('🚀 Phase 3: Initializing real-time automation system');
-      
+
       // Validate required environment variables
       this.validateConfiguration();
-      
+
       // Initialize services
       await this.initializeServices();
-      
+
       // Start event processing
       this.startEventProcessing();
-      
+
       this.isInitialized = true;
       logger.info('✅ Phase 3: Real-time automation system initialized successfully');
-      
+
       return {
         success: true,
         message: 'Phase 3 initialized successfully',
@@ -54,7 +54,6 @@ class Phase3Implementation {
           'Status monitoring'
         ]
       };
-      
     } catch (error) {
       logger.error('❌ Phase 3: Failed to initialize', { error: error.message });
       throw error;
@@ -72,8 +71,8 @@ class Phase3Implementation {
       'INTERCOM_TOKEN'
     ];
 
-    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-    
+    const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
+
     if (missingVars.length > 0) {
       throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
     }
@@ -95,7 +94,6 @@ class Phase3Implementation {
         await larkService.testConnection();
         logger.info('✅ Phase 3: Lark service connected');
       }
-
     } catch (error) {
       logger.error('❌ Phase 3: Service initialization failed', { error: error.message });
       throw error;
@@ -128,18 +126,18 @@ class Phase3Implementation {
     }
 
     const events = this.eventQueue.splice(0, 10); // Process up to 10 events at once
-    
+
     for (const event of events) {
       try {
         await this.processEvent(event);
         this.stats.eventsProcessed++;
       } catch (error) {
-        logger.error('❌ Phase 3: Event processing failed', { 
-          eventId: event.id, 
-          error: error.message 
+        logger.error('❌ Phase 3: Event processing failed', {
+          eventId: event.id,
+          error: error.message
         });
         this.stats.errors++;
-        
+
         // Retry failed events (up to 3 times)
         if (event.retryCount < 3) {
           event.retryCount++;
@@ -163,10 +161,10 @@ class Phase3Implementation {
     };
 
     this.eventQueue.push(event);
-    logger.info('📝 Phase 3: Event queued for processing', { 
-      eventId: event.id, 
+    logger.info('📝 Phase 3: Event queued for processing', {
+      eventId: event.id,
       type: event.type,
-      queueSize: this.eventQueue.length 
+      queueSize: this.eventQueue.length
     });
 
     return event.id;
@@ -178,10 +176,10 @@ class Phase3Implementation {
   async processEvent(event) {
     const { type, data } = event;
 
-    logger.info('🔄 Phase 3: Processing event', { 
-      eventId: event.id, 
+    logger.info('🔄 Phase 3: Processing event', {
+      eventId: event.id,
       type,
-      retryCount: event.retryCount 
+      retryCount: event.retryCount
     });
 
     switch (type) {
@@ -274,24 +272,24 @@ class Phase3Implementation {
    */
   formatTicketMessage(ticket, title, metadata = {}) {
     const { status, description, assignee, repliedBy, closedBy, noteBy } = metadata;
-    
+
     let message = `${title}\n\n`;
     message += `**Ticket ID:** ${ticket.id}\n`;
     message += `**Status:** ${status.toUpperCase()}\n`;
     message += `**Description:** ${description}\n`;
-    
+
     if (assignee) message += `**Assigned to:** ${assignee}\n`;
     if (repliedBy) message += `**Replied by:** ${repliedBy}\n`;
     if (closedBy) message += `**Closed by:** ${closedBy}\n`;
     if (noteBy) message += `**Note by:** ${noteBy}\n`;
-    
+
     message += `**Created:** ${new Date(ticket.created_at * 1000).toLocaleString()}\n`;
     message += `**Updated:** ${new Date(ticket.updated_at * 1000).toLocaleString()}\n`;
-    
+
     if (process.env.INTERCOM_APP_ID) {
       message += `\n[View in Intercom](https://app.intercom.io/a/apps/${process.env.INTERCOM_APP_ID}/inbox/conversation/${ticket.id})`;
     }
-    
+
     return message;
   }
 
@@ -301,7 +299,7 @@ class Phase3Implementation {
   async sendNotification(message) {
     try {
       const chatGroupId = process.env.LARK_CHAT_GROUP_ID;
-      
+
       if (!chatGroupId) {
         logger.warn('⚠️ Phase 3: No Lark chat group configured');
         return;
@@ -309,19 +307,18 @@ class Phase3Implementation {
 
       // For now, we'll use the existing chatbot service
       // In a real implementation, this would use the Lark API directly
-      logger.info('📤 Phase 3: Sending notification to Lark', { 
+      logger.info('📤 Phase 3: Sending notification to Lark', {
         chatGroupId,
-        messageLength: message.length 
+        messageLength: message.length
       });
 
       // Placeholder for actual Lark API call
       // await larkService.sendMessage(chatGroupId, message);
-      
+
       // For now, just log the message
       logger.info('📨 Phase 3: Notification sent', { message });
-      
+
       this.stats.notificationsSent++;
-      
     } catch (error) {
       logger.error('❌ Phase 3: Failed to send notification', { error: error.message });
       throw error;
@@ -355,7 +352,7 @@ class Phase3Implementation {
     return {
       ...this.stats,
       queueSize: this.eventQueue.length,
-      averageProcessingTime: this.stats.eventsProcessed > 0 ? 
+      averageProcessingTime: this.stats.eventsProcessed > 0 ?
         (Date.now() - this.stats.lastProcessedAt) / this.stats.eventsProcessed : 0
     };
   }
@@ -365,15 +362,15 @@ class Phase3Implementation {
    */
   async shutdown() {
     logger.info('🛑 Phase 3: Shutting down gracefully');
-    
+
     this.processingEvents = false;
-    
+
     // Process remaining events
     if (this.eventQueue.length > 0) {
       logger.info(`📝 Phase 3: Processing ${this.eventQueue.length} remaining events`);
       await this.processEventQueue();
     }
-    
+
     this.isInitialized = false;
     logger.info('✅ Phase 3: Shutdown complete');
   }
@@ -397,14 +394,13 @@ if (require.main === module) {
       require('dotenv').config();
       const result = await phase3.initialize();
       console.log('Phase 3 initialized:', result);
-      
+
       // Keep the process running
       process.on('SIGINT', async () => {
         console.log('Shutting down Phase 3...');
         await phase3.shutdown();
         process.exit(0);
       });
-      
     } catch (error) {
       console.error('Failed to initialize Phase 3:', error.message);
       process.exit(1);

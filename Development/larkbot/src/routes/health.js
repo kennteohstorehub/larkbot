@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const healthStatus = getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
 router.get('/detailed', async (req, res) => {
   try {
     const healthStatus = getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
@@ -73,14 +73,14 @@ router.get('/service/:serviceName', async (req, res) => {
   try {
     const { serviceName } = req.params;
     const healthStatus = getHealthStatus();
-    
+
     if (!healthStatus.services[serviceName]) {
       return res.status(404).json({
         status: 'error',
         message: `Service '${serviceName}' not found`
       });
     }
-    
+
     res.json({
       status: 'ok',
       service: serviceName,
@@ -96,4 +96,4 @@ router.get('/service/:serviceName', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

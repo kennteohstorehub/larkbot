@@ -22,7 +22,7 @@ class ExportService {
     try {
       // Create output directory if it doesn't exist
       await this.ensureOutputDirectory();
-      
+
       this.isInitialized = true;
       logger.info('Export service initialized successfully', {
         outputDir: this.outputDir,
@@ -75,7 +75,7 @@ class ExportService {
     try {
       const jsonString = pretty ? JSON.stringify(exportData, null, 2) : JSON.stringify(exportData);
       await fs.writeFile(filepath, jsonString, 'utf8');
-      
+
       logger.info('Data exported to JSON', {
         filename: fullFilename,
         filepath,
@@ -112,21 +112,21 @@ class ExportService {
     try {
       // Process data for CSV format
       const processedData = flatten ? this.flattenData(data) : data;
-      
+
       // Auto-detect headers if not provided
       const csvHeaders = headers || this.detectHeaders(processedData);
-      
+
       // Create CSV writer
       const writer = csvWriter.createObjectCsvWriter({
         path: filepath,
-        header: csvHeaders.map(header => ({
+        header: csvHeaders.map((header) => ({
           id: header,
           title: header
         }))
       });
 
       await writer.writeRecords(processedData);
-      
+
       logger.info('Data exported to CSV', {
         filename: fullFilename,
         filepath,
@@ -161,11 +161,10 @@ class ExportService {
 
     if (format === 'csv') {
       // Transform conversations for CSV export
-      const csvData = conversations.map(conv => this.transformConversationForCSV(conv));
+      const csvData = conversations.map((conv) => this.transformConversationForCSV(conv));
       return await this.exportToCSV(csvData, filename, { ...options, metadata });
-    } else {
-      return await this.exportToJSON(conversations, filename, { ...options, metadata });
     }
+    return await this.exportToJSON(conversations, filename, { ...options, metadata });
   }
 
   /**
@@ -187,11 +186,10 @@ class ExportService {
     };
 
     if (format === 'csv') {
-      const csvData = tickets.map(ticket => this.transformTicketForCSV(ticket));
+      const csvData = tickets.map((ticket) => this.transformTicketForCSV(ticket));
       return await this.exportToCSV(csvData, filename, { ...options, metadata });
-    } else {
-      return await this.exportToJSON(tickets, filename, { ...options, metadata });
     }
+    return await this.exportToJSON(tickets, filename, { ...options, metadata });
   }
 
   /**
@@ -219,7 +217,7 @@ class ExportService {
       contact_name: conversation.contacts?.contacts?.[0]?.name || '',
       contact_email: conversation.contacts?.contacts?.[0]?.email || '',
       conversation_message_count: conversation.conversation_message?.total_count || 0,
-      tags: conversation.tags?.tags?.map(tag => tag.name).join(', ') || '',
+      tags: conversation.tags?.tags?.map((tag) => tag.name).join(', ') || '',
       source_type: conversation.source?.type || '',
       source_url: conversation.source?.url || '',
       source_author_name: conversation.source?.author?.name || '',
@@ -248,7 +246,7 @@ class ExportService {
       contact_id: ticket.contacts?.contacts?.[0]?.id || '',
       contact_name: ticket.contacts?.contacts?.[0]?.name || '',
       contact_email: ticket.contacts?.contacts?.[0]?.email || '',
-      tags: ticket.tags?.tags?.map(tag => tag.name).join(', ') || ''
+      tags: ticket.tags?.tags?.map((tag) => tag.name).join(', ') || ''
     };
   }
 
@@ -258,7 +256,7 @@ class ExportService {
    * @returns {Array} Flattened data
    */
   flattenData(data) {
-    return data.map(item => this.flattenObject(item));
+    return data.map((item) => this.flattenObject(item));
   }
 
   /**
@@ -269,10 +267,10 @@ class ExportService {
    */
   flattenObject(obj, prefix = '') {
     const flattened = {};
-    
+
     for (const [key, value] of Object.entries(obj)) {
       const newKey = prefix ? `${prefix}.${key}` : key;
-      
+
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         Object.assign(flattened, this.flattenObject(value, newKey));
       } else if (Array.isArray(value)) {
@@ -281,7 +279,7 @@ class ExportService {
         flattened[newKey] = value;
       }
     }
-    
+
     return flattened;
   }
 
@@ -292,12 +290,12 @@ class ExportService {
    */
   detectHeaders(data) {
     if (!data || data.length === 0) return [];
-    
+
     const headers = new Set();
-    data.forEach(item => {
-      Object.keys(item).forEach(key => headers.add(key));
+    data.forEach((item) => {
+      Object.keys(item).forEach((key) => headers.add(key));
     });
-    
+
     return Array.from(headers);
   }
 
@@ -347,7 +345,7 @@ class ExportService {
       cutoffDate.setDate(cutoffDate.getDate() - maxAge);
 
       let deletedCount = 0;
-      
+
       for (const file of files) {
         if (file.created < cutoffDate) {
           await fs.unlink(file.filepath);
@@ -393,4 +391,4 @@ class ExportService {
 // Create singleton instance
 const exportService = new ExportService();
 
-module.exports = exportService; 
+module.exports = exportService;

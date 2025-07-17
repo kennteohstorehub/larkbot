@@ -163,7 +163,7 @@ router.post('/contacts', async (req, res) => {
     const contacts = allContacts.slice(0, limit);
 
     // Export to specified format
-    const filepath = format === 'csv' 
+    const filepath = format === 'csv'
       ? await exportService.exportToCSV(contacts, 'contacts')
       : await exportService.exportToJSON(contacts, 'contacts');
 
@@ -193,10 +193,10 @@ router.post('/contacts', async (req, res) => {
 router.get('/files', async (req, res) => {
   try {
     const files = await exportService.listExportedFiles();
-    
+
     res.json({
       success: true,
-      data: files.map(file => ({
+      data: files.map((file) => ({
         filename: file.filename,
         size: file.size,
         sizeKB: file.sizeKB,
@@ -221,9 +221,9 @@ router.get('/files', async (req, res) => {
 router.delete('/cleanup', async (req, res) => {
   try {
     const { maxAge = 7 } = req.body;
-    
+
     const deletedCount = await exportService.cleanupOldFiles(maxAge);
-    
+
     res.json({
       success: true,
       message: `Cleaned up ${deletedCount} old files`,
@@ -289,7 +289,7 @@ router.post('/custom', async (req, res) => {
       case 'contacts':
         const contactResult = await intercomService.getContacts({ perPage: limit });
         data = contactResult.contacts;
-        filepath = format === 'csv' 
+        filepath = format === 'csv'
           ? await exportService.exportToCSV(data, 'contacts')
           : await exportService.exportToJSON(data, 'contacts');
         break;
@@ -315,4 +315,4 @@ router.post('/custom', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

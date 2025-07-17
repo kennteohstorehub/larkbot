@@ -23,12 +23,12 @@ const createLogger = () => {
     }),
     winston.format.printf(({ timestamp, level, message, ...meta }) => {
       let log = `${timestamp} [${level}]: ${message}`;
-      
+
       // Add metadata if present
       if (Object.keys(meta).length > 0) {
         log += ` ${JSON.stringify(meta)}`;
       }
-      
+
       return log;
     })
   );
@@ -48,7 +48,7 @@ const createLogger = () => {
   if (config.isProduction()) {
     // Create logs directory if it doesn't exist
     const logsDir = path.join(__dirname, '../../logs');
-    
+
     // General log file
     transports.push(
       new winston.transports.File({
@@ -165,4 +165,4 @@ logger.logError = (context, error, metadata = {}) => {
   });
 };
 
-module.exports = logger; 
+module.exports = logger;

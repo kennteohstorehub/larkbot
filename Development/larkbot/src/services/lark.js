@@ -12,7 +12,7 @@ class LarkService {
     this.accessToken = null;
     this.tokenExpiry = null;
     this.isInitialized = false;
-    
+
     // API endpoints
     this.endpoints = {
       auth: '/auth/v3/tenant_access_token/internal',
@@ -31,9 +31,9 @@ class LarkService {
    */
   async initialize() {
     if (this.isInitialized) return;
-    
+
     logger.info('🦜 Initializing Lark Suite service');
-    
+
     if (!config.lark.appId || !config.lark.appSecret) {
       logger.warn('🦜 Lark Suite credentials not configured - using mock mode');
       this.isInitialized = true;
@@ -43,13 +43,12 @@ class LarkService {
     try {
       // Get access token
       await this.getAccessToken();
-      
+
       // Test connection
       await this.testConnection();
-      
+
       this.isInitialized = true;
       logger.info('✅ Lark Suite service initialized successfully');
-      
     } catch (error) {
       logger.error('❌ Failed to initialize Lark Suite service', { error: error.message });
       throw error;
@@ -83,7 +82,6 @@ class LarkService {
 
       logger.info('✅ Lark Suite access token obtained');
       return this.accessToken;
-
     } catch (error) {
       logger.error('❌ Failed to get Lark Suite access token', { error: error.message });
       throw error;
@@ -98,14 +96,12 @@ class LarkService {
 
     try {
       const response = await this.makeRequest('GET', this.endpoints.bots);
-      
+
       if (response.code === 0) {
         logger.info('✅ Lark Suite connection successful', { bot: response.data });
         return response.data;
-      } else {
-        throw new Error(`Connection test failed: ${response.msg}`);
       }
-
+      throw new Error(`Connection test failed: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Lark Suite connection test failed', { error: error.message });
       throw error;
@@ -122,7 +118,7 @@ class LarkService {
       method,
       url: `${this.baseURL}${endpoint}`,
       headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
+        Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
       },
       params
@@ -159,14 +155,12 @@ class LarkService {
 
     try {
       const response = await this.makeRequest('POST', this.endpoints.messages, messageData);
-      
+
       if (response.code === 0) {
         logger.info('✅ Message sent successfully', { messageId: response.data.message_id });
         return response.data;
-      } else {
-        throw new Error(`Failed to send message: ${response.msg}`);
       }
-
+      throw new Error(`Failed to send message: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Failed to send Lark message', { error: error.message });
       throw error;
@@ -186,17 +180,15 @@ class LarkService {
 
     try {
       const response = await this.makeRequest('POST', this.endpoints.documents, docData);
-      
+
       if (response.code === 0) {
-        logger.info('✅ Document created successfully', { 
+        logger.info('✅ Document created successfully', {
           documentId: response.data.document_id,
-          url: response.data.url 
+          url: response.data.url
         });
         return response.data;
-      } else {
-        throw new Error(`Failed to create document: ${response.msg}`);
       }
-
+      throw new Error(`Failed to create document: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Failed to create Lark document', { error: error.message });
       throw error;
@@ -217,17 +209,15 @@ class LarkService {
 
     try {
       const response = await this.makeRequest('POST', this.endpoints.spreadsheets, spreadsheetData);
-      
+
       if (response.code === 0) {
-        logger.info('✅ Spreadsheet created successfully', { 
+        logger.info('✅ Spreadsheet created successfully', {
           spreadsheetId: response.data.spreadsheet_token,
-          url: response.data.url 
+          url: response.data.url
         });
         return response.data;
-      } else {
-        throw new Error(`Failed to create spreadsheet: ${response.msg}`);
       }
-
+      throw new Error(`Failed to create spreadsheet: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Failed to create Lark spreadsheet', { error: error.message });
       throw error;
@@ -248,14 +238,12 @@ class LarkService {
     try {
       const endpoint = `${this.endpoints.spreadsheets}/${spreadsheetToken}/values/${range}`;
       const response = await this.makeRequest('PUT', endpoint, updateData);
-      
+
       if (response.code === 0) {
         logger.info('✅ Spreadsheet updated successfully');
         return response.data;
-      } else {
-        throw new Error(`Failed to update spreadsheet: ${response.msg}`);
       }
-
+      throw new Error(`Failed to update spreadsheet: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Failed to update Lark spreadsheet', { error: error.message });
       throw error;
@@ -270,14 +258,12 @@ class LarkService {
 
     try {
       const response = await this.makeRequest('GET', this.endpoints.users, null, params);
-      
+
       if (response.code === 0) {
         logger.info('✅ Users retrieved successfully', { count: response.data.items?.length });
         return response.data;
-      } else {
-        throw new Error(`Failed to get users: ${response.msg}`);
       }
-
+      throw new Error(`Failed to get users: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Failed to get Lark users', { error: error.message });
       throw error;
@@ -292,14 +278,12 @@ class LarkService {
 
     try {
       const response = await this.makeRequest('GET', this.endpoints.departments, null, params);
-      
+
       if (response.code === 0) {
         logger.info('✅ Departments retrieved successfully', { count: response.data.items?.length });
         return response.data;
-      } else {
-        throw new Error(`Failed to get departments: ${response.msg}`);
       }
-
+      throw new Error(`Failed to get departments: ${response.msg}`);
     } catch (error) {
       logger.error('❌ Failed to get Lark departments', { error: error.message });
       throw error;
@@ -310,20 +294,20 @@ class LarkService {
    * Export Intercom data to Lark spreadsheet
    */
   async exportToSpreadsheet(data, title, type = 'conversations') {
-    logger.info('📊 Exporting data to Lark spreadsheet', { 
-      title, 
-      type, 
-      count: data.length 
+    logger.info('📊 Exporting data to Lark spreadsheet', {
+      title,
+      type,
+      count: data.length
     });
 
     try {
       // Create spreadsheet
       const spreadsheet = await this.createSpreadsheet(title);
-      
+
       // Prepare data for spreadsheet
       const headers = this.getSpreadsheetHeaders(type);
       const rows = this.convertDataToRows(data, type);
-      
+
       // Update with data
       await this.updateSpreadsheetData(
         spreadsheet.spreadsheet_token,
@@ -341,7 +325,6 @@ class LarkService {
         url: spreadsheet.url,
         rowCount: rows.length
       };
-
     } catch (error) {
       logger.error('❌ Failed to export to Lark spreadsheet', { error: error.message });
       throw error;
@@ -387,15 +370,15 @@ class LarkService {
   getSpreadsheetHeaders(type) {
     const headers = {
       conversations: [
-        'ID', 'Subject', 'State', 'Priority', 'Created', 'Updated', 
+        'ID', 'Subject', 'State', 'Priority', 'Created', 'Updated',
         'Assignee', 'Customer', 'Tags', 'Message Count'
       ],
       tickets: [
-        'ID', 'Subject', 'State', 'Priority', 'Category', 'Created', 
+        'ID', 'Subject', 'State', 'Priority', 'Category', 'Created',
         'Updated', 'Assignee', 'Customer', 'Tags'
       ],
       contacts: [
-        'ID', 'Name', 'Email', 'Phone', 'Created', 'Last Seen', 
+        'ID', 'Name', 'Email', 'Phone', 'Created', 'Last Seen',
         'Location', 'Plan', 'Tags'
       ]
     };
@@ -404,7 +387,7 @@ class LarkService {
   }
 
   convertDataToRows(data, type) {
-    return data.map(item => {
+    return data.map((item) => {
       switch (type) {
         case 'conversations':
           return [
@@ -416,7 +399,7 @@ class LarkService {
             new Date(item.updated_at).toISOString(),
             item.assignee?.name || '',
             item.contacts?.contacts?.[0]?.name || '',
-            item.tags?.tags?.map(t => t.name).join(', ') || '',
+            item.tags?.tags?.map((t) => t.name).join(', ') || '',
             item.conversation_message?.total_count || 0
           ];
         case 'tickets':
@@ -430,7 +413,7 @@ class LarkService {
             new Date(item.updated_at).toISOString(),
             item.assignee?.name || '',
             item.contacts?.contacts?.[0]?.name || '',
-            item.tags?.tags?.map(t => t.name).join(', ') || ''
+            item.tags?.tags?.map((t) => t.name).join(', ') || ''
           ];
         case 'contacts':
           return [
@@ -442,7 +425,7 @@ class LarkService {
             item.last_seen_at ? new Date(item.last_seen_at).toISOString() : '',
             `${item.location?.city || ''}, ${item.location?.country || ''}`,
             item.custom_attributes?.plan || '',
-            item.tags?.tags?.map(t => t.name).join(', ') || ''
+            item.tags?.tags?.map((t) => t.name).join(', ') || ''
           ];
         default:
           return Object.values(item);
@@ -462,9 +445,9 @@ class LarkService {
 
 🏷️ Top Categories:
 ${Object.entries(summary.processing?.conversations?.categories || {})
-  .slice(0, 3)
-  .map(([cat, count]) => `• ${cat}: ${count}`)
-  .join('\n')}
+    .slice(0, 3)
+    .map(([cat, count]) => `• ${cat}: ${count}`)
+    .join('\n')}
 
 📊 Insights:
 • Most Common Category: ${summary.insights?.mostCommonCategory || 'N/A'}
@@ -488,14 +471,86 @@ Generated: ${new Date().toISOString()}
 - Report generated automatically from Intercom data
 
 ## Data Overview
-${data.slice(0, 10).map((item, index) => 
-  `${index + 1}. ${item.subject || item.name || item.id}`
-).join('\n')}
+${data.slice(0, 10).map((item, index) =>
+    `${index + 1}. ${item.subject || item.name || item.id}`
+  ).join('\n')}
 
 ${data.length > 10 ? `\n... and ${data.length - 10} more items` : ''}
 
 ---
 Generated by Intercom-Lark Automation System`;
+  }
+
+  /**
+   * List all chats where the bot is a member
+   */
+  async listBotChats(params = {}) {
+    logger.info('💬 Getting bot chat groups', { params });
+
+    try {
+      const chats = [];
+      let hasMore = true;
+      let pageToken = '';
+
+      while (hasMore) {
+        const response = await this.makeRequest('GET', '/im/v1/chats', null, {
+          user_id_type: 'open_id',
+          page_size: params.pageSize || 100,
+          page_token: pageToken,
+          ...params
+        });
+
+        if (response.code === 0) {
+          const { items, has_more, page_token } = response.data;
+          chats.push(...(items || []));
+          hasMore = has_more && !params.limit;
+          pageToken = page_token;
+
+          // If limit is specified, stop when we have enough
+          if (params.limit && chats.length >= params.limit) {
+            return {
+              success: true,
+              chats: chats.slice(0, params.limit),
+              totalCount: chats.length
+            };
+          }
+        } else {
+          throw new Error(`Failed to list chats: ${response.msg}`);
+        }
+      }
+
+      logger.info('✅ Bot chat groups retrieved successfully', { count: chats.length });
+      return {
+        success: true,
+        chats,
+        totalCount: chats.length
+      };
+    } catch (error) {
+      logger.error('❌ Failed to get bot chat groups', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Get detailed information about a specific chat
+   */
+  async getChatInfo(chatId) {
+    logger.info('💬 Getting chat info', { chatId });
+
+    try {
+      const response = await this.makeRequest('GET', `/im/v1/chats/${chatId}`, null, {
+        user_id_type: 'open_id'
+      });
+
+      if (response.code === 0) {
+        logger.info('✅ Chat info retrieved successfully', { chatId });
+        return response.data;
+      }
+      throw new Error(`Failed to get chat info: ${response.msg}`);
+    } catch (error) {
+      logger.error('❌ Failed to get chat info', { chatId, error: error.message });
+      throw error;
+    }
   }
 
   /**
@@ -521,4 +576,4 @@ Generated by Intercom-Lark Automation System`;
 // Create singleton instance
 const larkService = new LarkService();
 
-module.exports = larkService; 
+module.exports = larkService;

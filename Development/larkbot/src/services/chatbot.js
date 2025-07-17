@@ -19,16 +19,15 @@ class ChatbotService {
    */
   async initialize() {
     if (this.isInitialized) return;
-    
+
     logger.info('🤖 Initializing Chatbot service');
-    
+
     try {
       // Initialize Lark service
       await larkService.initialize();
-      
+
       this.isInitialized = true;
       logger.info('✅ Chatbot service initialized successfully');
-      
     } catch (error) {
       logger.error('❌ Failed to initialize Chatbot service', { error: error.message });
       throw error;
@@ -131,13 +130,13 @@ class ChatbotService {
    */
   async processMessage(message) {
     const { content, chatId, userId, messageType } = message;
-    
+
     logger.info('🤖 Processing message', { chatId, userId, messageType });
 
     try {
       // Parse command from message
       const command = this.parseCommand(content);
-      
+
       if (!command) {
         // Not a command, ignore or provide help
         return await this.sendHelpMessage(chatId);
@@ -146,7 +145,6 @@ class ChatbotService {
       // Execute command
       const result = await this.executeCommand(command, chatId, userId);
       return result;
-
     } catch (error) {
       logger.error('❌ Error processing message', { error: error.message });
       return await this.sendErrorMessage(chatId, error.message);
@@ -175,7 +173,7 @@ class ChatbotService {
    */
   async executeCommand(command, chatId, userId) {
     const { name, args } = command;
-    
+
     const commandHandler = this.commands.get(name);
     if (!commandHandler) {
       return await this.sendMessage(chatId, `❌ Unknown command: ${name}\nUse /help to see available commands.`);
@@ -205,7 +203,7 @@ class ChatbotService {
     try {
       // Get ticket from Intercom
       const ticket = await this.getTicketDetails(ticketId);
-      
+
       if (!ticket) {
         return await this.sendMessage(chatId, `❌ Ticket not found: ${ticketId}`);
       }
@@ -213,7 +211,6 @@ class ChatbotService {
       // Format and send ticket information
       const message = this.formatTicketMessage(ticket);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get ticket ${ticketId}: ${error.message}`);
     }
@@ -232,7 +229,7 @@ class ChatbotService {
 
       // Get tickets from Intercom
       const tickets = await intercomService.getTickets({ page: 1, perPage: limit });
-      
+
       if (!tickets.tickets || tickets.tickets.length === 0) {
         return await this.sendMessage(chatId, '📭 No tickets found matching your criteria.');
       }
@@ -240,12 +237,12 @@ class ChatbotService {
       // Apply additional filters
       let filteredTickets = tickets.tickets;
       if (filters.state) {
-        filteredTickets = filteredTickets.filter(t => 
+        filteredTickets = filteredTickets.filter((t) =>
           t.ticket_attributes?.state === filters.state
         );
       }
       if (filters.priority) {
-        filteredTickets = filteredTickets.filter(t => 
+        filteredTickets = filteredTickets.filter((t) =>
           t.ticket_attributes?.priority === filters.priority
         );
       }
@@ -253,7 +250,6 @@ class ChatbotService {
       // Format and send tickets list
       const message = this.formatTicketsListMessage(filteredTickets, filters);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get tickets: ${error.message}`);
     }
@@ -272,14 +268,13 @@ class ChatbotService {
 
     try {
       const ticket = await this.getTicketDetails(ticketId);
-      
+
       if (!ticket) {
         return await this.sendMessage(chatId, `❌ Ticket not found: ${ticketId}`);
       }
 
       const message = this.formatTicketStatusMessage(ticket);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get status for ${ticketId}: ${error.message}`);
     }
@@ -294,10 +289,9 @@ class ChatbotService {
     try {
       const date = args[0] || 'today';
       const summary = await this.generateTicketSummary(date);
-      
+
       const message = this.formatSummaryMessage(summary);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to generate summary: ${error.message}`);
     }
@@ -316,14 +310,13 @@ class ChatbotService {
 
     try {
       const conversation = await intercomService.getConversation(conversationId);
-      
+
       if (!conversation) {
         return await this.sendMessage(chatId, `❌ Conversation not found: ${conversationId}`);
       }
 
       const message = this.formatConversationMessage(conversation);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get conversation ${conversationId}: ${error.message}`);
     }
@@ -340,19 +333,18 @@ class ChatbotService {
       const limit = filters.limit || 5;
 
       const conversations = await intercomService.getConversations({ page: 1, perPage: limit });
-      
+
       if (!conversations.conversations || conversations.conversations.length === 0) {
         return await this.sendMessage(chatId, '📭 No conversations found matching your criteria.');
       }
 
       let filteredConversations = conversations.conversations;
       if (filters.state) {
-        filteredConversations = filteredConversations.filter(c => c.state === filters.state);
+        filteredConversations = filteredConversations.filter((c) => c.state === filters.state);
       }
 
       const message = this.formatConversationsListMessage(filteredConversations, filters);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get conversations: ${error.message}`);
     }
@@ -401,16 +393,14 @@ class ChatbotService {
         }
       }
       return await this.sendMessage(chatId, `✅ Unsubscribed from all updates (${removed.length} subscriptions removed).`);
-    } else {
-      // Remove specific subscription
-      const key = `${chatId}_${target}`;
-      if (this.subscriptions.has(key)) {
-        this.subscriptions.delete(key);
-        return await this.sendMessage(chatId, `✅ Unsubscribed from updates for: ${target}`);
-      } else {
-        return await this.sendMessage(chatId, `❌ No subscription found for: ${target}`);
-      }
     }
+    // Remove specific subscription
+    const key = `${chatId}_${target}`;
+    if (this.subscriptions.has(key)) {
+      this.subscriptions.delete(key);
+      return await this.sendMessage(chatId, `✅ Unsubscribed from updates for: ${target}`);
+    }
+    return await this.sendMessage(chatId, `❌ No subscription found for: ${target}`);
   }
 
   /**
@@ -422,10 +412,9 @@ class ChatbotService {
     try {
       const period = args[0] || 'today';
       const stats = await this.generateTicketStats(period);
-      
+
       const message = this.formatStatsMessage(stats);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to generate stats: ${error.message}`);
     }
@@ -440,9 +429,9 @@ class ChatbotService {
     try {
       // Parse custom filters from args
       const filters = this.parseCustomFilters(args);
-      
+
       if (!filters.customAttributes && !filters.ticketType) {
-        return await this.sendMessage(chatId, 
+        return await this.sendMessage(chatId,
           '❌ Please specify custom attributes or ticket types.\n' +
           'Usage: /tickets-custom type=bug,feature custom=department:engineering,priority:high'
         );
@@ -450,7 +439,7 @@ class ChatbotService {
 
       // Get tickets from Intercom
       const tickets = await intercomService.getTickets({ page: 1, perPage: 50 });
-      
+
       if (!tickets.tickets || tickets.tickets.length === 0) {
         return await this.sendMessage(chatId, '📭 No tickets found.');
       }
@@ -458,7 +447,7 @@ class ChatbotService {
       // Apply custom filtering using Phase 2 filtering
       const phase2 = require('../phases/phase2');
       await phase2.initialize();
-      
+
       let filteredTickets = tickets.tickets;
 
       // Apply custom attributes filter
@@ -487,7 +476,6 @@ class ChatbotService {
       // Format and send response
       const message = this.formatCustomTicketsMessage(filteredTickets, filters);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get custom tickets: ${error.message}`);
     }
@@ -502,9 +490,9 @@ class ChatbotService {
     try {
       // Parse type filters from args
       const filters = this.parseTypeFilters(args);
-      
+
       if (!filters.types && !filters.categories && !filters.sources) {
-        return await this.sendMessage(chatId, 
+        return await this.sendMessage(chatId,
           '❌ Please specify ticket types, categories, or sources.\n' +
           'Usage: /tickets-type type=bug,technical category=urgent source=email'
         );
@@ -512,7 +500,7 @@ class ChatbotService {
 
       // Get tickets from Intercom
       const tickets = await intercomService.getTickets({ page: 1, perPage: 50 });
-      
+
       if (!tickets.tickets || tickets.tickets.length === 0) {
         return await this.sendMessage(chatId, '📭 No tickets found.');
       }
@@ -520,7 +508,7 @@ class ChatbotService {
       // Apply type filtering using Phase 2 filtering
       const phase2 = require('../phases/phase2');
       await phase2.initialize();
-      
+
       const filteredData = await phase2.applyFilters(tickets.tickets, {
         ticketType: filters
       });
@@ -532,7 +520,6 @@ class ChatbotService {
       // Format and send response
       const message = this.formatTypeTicketsMessage(filteredData.filtered, filters);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to get tickets by type: ${error.message}`);
     }
@@ -547,7 +534,7 @@ class ChatbotService {
     try {
       // Parse advanced filters from args
       let filterConfig;
-      
+
       if (args.length === 0) {
         // Show filter examples
         return await this.sendMessage(chatId, this.getFilterExamples());
@@ -564,7 +551,7 @@ class ChatbotService {
 
       // Get tickets from Intercom
       const tickets = await intercomService.getTickets({ page: 1, perPage: 100 });
-      
+
       if (!tickets.tickets || tickets.tickets.length === 0) {
         return await this.sendMessage(chatId, '📭 No tickets found.');
       }
@@ -572,7 +559,7 @@ class ChatbotService {
       // Apply advanced filtering using Phase 2 filtering
       const phase2 = require('../phases/phase2');
       await phase2.initialize();
-      
+
       const filteredData = await phase2.applyFilters(tickets.tickets, filterConfig);
 
       if (filteredData.filtered.length === 0) {
@@ -582,7 +569,6 @@ class ChatbotService {
       // Format and send response
       const message = this.formatAdvancedTicketsMessage(filteredData.filtered, filterConfig);
       return await this.sendMessage(chatId, message);
-
     } catch (error) {
       return await this.sendErrorMessage(chatId, `Failed to apply advanced filters: ${error.message}`);
     }
@@ -596,7 +582,7 @@ class ChatbotService {
       // Help for specific command
       const commandName = args[0];
       const command = this.commands.get(commandName);
-      
+
       if (!command) {
         return await this.sendMessage(chatId, `❌ Unknown command: ${commandName}`);
       }
@@ -645,8 +631,7 @@ class ChatbotService {
 
       // For real Intercom API, implement actual ticket lookup
       const tickets = await intercomService.getTickets({ page: 1, perPage: 100 });
-      return tickets.tickets.find(t => t.id === ticketId);
-
+      return tickets.tickets.find((t) => t.id === ticketId);
     } catch (error) {
       logger.error('❌ Failed to get ticket details', { ticketId, error: error.message });
       throw error;
@@ -659,12 +644,12 @@ class ChatbotService {
   async generateTicketSummary(period = 'today') {
     try {
       const tickets = await intercomService.getTickets({ page: 1, perPage: 100 });
-      
+
       // Filter by period (simplified for demo)
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
-      const filteredTickets = tickets.tickets.filter(ticket => {
+
+      const filteredTickets = tickets.tickets.filter((ticket) => {
         const ticketDate = new Date(ticket.created_at);
         return ticketDate >= startOfDay;
       });
@@ -677,7 +662,7 @@ class ChatbotService {
         byCategory: {}
       };
 
-      filteredTickets.forEach(ticket => {
+      filteredTickets.forEach((ticket) => {
         const state = ticket.ticket_attributes?.state || 'unknown';
         const priority = ticket.ticket_attributes?.priority || 'unknown';
         const category = ticket.ticket_attributes?.category || 'unknown';
@@ -692,7 +677,6 @@ class ChatbotService {
         stats,
         tickets: filteredTickets
       };
-
     } catch (error) {
       logger.error('❌ Failed to generate summary', { error: error.message });
       throw error;
@@ -704,8 +688,8 @@ class ChatbotService {
    */
   parseFilters(args) {
     const filters = {};
-    
-    args.forEach(arg => {
+
+    args.forEach((arg) => {
       if (arg.includes('=')) {
         const [key, value] = arg.split('=');
         filters[key] = value;
@@ -724,15 +708,15 @@ class ChatbotService {
       ticketType: {},
       matchMode: 'any'
     };
-    
-    args.forEach(arg => {
+
+    args.forEach((arg) => {
       const [key, value] = arg.split('=');
       if (!key || !value) return;
-      
+
       if (key === 'custom') {
         // Parse custom attributes: custom=department:engineering,priority:high
         const pairs = value.split(',');
-        pairs.forEach(pair => {
+        pairs.forEach((pair) => {
           const [attrKey, attrValue] = pair.split(':');
           if (attrKey && attrValue) {
             filters.customAttributes[attrKey] = attrValue;
@@ -752,7 +736,7 @@ class ChatbotService {
         filters.matchMode = value;
       }
     });
-    
+
     return filters;
   }
 
@@ -761,11 +745,11 @@ class ChatbotService {
    */
   parseTypeFilters(args) {
     const filters = {};
-    
-    args.forEach(arg => {
+
+    args.forEach((arg) => {
       const [key, value] = arg.split('=');
       if (!key || !value) return;
-      
+
       if (key === 'type') {
         filters.types = value.split(',');
       } else if (key === 'category') {
@@ -774,7 +758,7 @@ class ChatbotService {
         filters.sources = value.split(',');
       }
     });
-    
+
     return filters;
   }
 
@@ -783,16 +767,16 @@ class ChatbotService {
    */
   parseAdvancedFilters(args) {
     const filters = {};
-    
-    args.forEach(arg => {
+
+    args.forEach((arg) => {
       const [key, value] = arg.split('=');
       if (!key || !value) return;
-      
+
       // Support nested filter configuration
       if (key.includes('.')) {
         const [filterType, filterKey] = key.split('.');
         if (!filters[filterType]) filters[filterType] = {};
-        
+
         // Handle array values
         if (value.includes(',')) {
           filters[filterType][filterKey] = value.split(',');
@@ -808,7 +792,7 @@ class ChatbotService {
         }
       }
     });
-    
+
     return filters;
   }
 
@@ -820,19 +804,19 @@ class ChatbotService {
     const subject = ticket.ticket_attributes?.subject || 'No subject';
     const assignee = ticket.assignee?.name || 'Unassigned';
     const customer = ticket.contacts?.contacts?.[0]?.name || 'Unknown';
-    
+
     const stateIcon = {
-      'open': '🔴',
-      'pending': '🟡',
-      'resolved': '🟢',
-      'closed': '✅'
+      open: '🔴',
+      pending: '🟡',
+      resolved: '🟢',
+      closed: '✅'
     }[state] || '⚪';
 
     const priorityIcon = {
-      'low': '🔵',
-      'normal': '🟡',
-      'high': '🟠',
-      'urgent': '🔴'
+      low: '🔵',
+      normal: '🟡',
+      high: '🟠',
+      urgent: '🔴'
     }[priority] || '⚪';
 
     return `🎫 **Ticket Details**
@@ -854,7 +838,7 @@ class ChatbotService {
       .join(', ');
 
     let message = `🎫 **Tickets List**${filterText ? ` (${filterText})` : ''}\n\n`;
-    
+
     if (tickets.length === 0) {
       message += '📭 No tickets found matching your criteria.';
       return message;
@@ -864,12 +848,12 @@ class ChatbotService {
       const state = ticket.ticket_attributes?.state || 'unknown';
       const priority = ticket.ticket_attributes?.priority || 'unknown';
       const subject = ticket.ticket_attributes?.subject || 'No subject';
-      
+
       const stateIcon = {
-        'open': '🔴',
-        'pending': '🟡',
-        'resolved': '🟢',
-        'closed': '✅'
+        open: '🔴',
+        pending: '🟡',
+        resolved: '🟢',
+        closed: '✅'
       }[state] || '⚪';
 
       message += `${index + 1}. ${stateIcon} **${ticket.id}**\n`;
@@ -883,12 +867,12 @@ class ChatbotService {
   formatTicketStatusMessage(ticket) {
     const state = ticket.ticket_attributes?.state || 'unknown';
     const priority = ticket.ticket_attributes?.priority || 'unknown';
-    
+
     const stateIcon = {
-      'open': '🔴',
-      'pending': '🟡',
-      'resolved': '🟢',
-      'closed': '✅'
+      open: '🔴',
+      pending: '🟡',
+      resolved: '🟢',
+      closed: '✅'
     }[state] || '⚪';
 
     return `📊 **Ticket Status**
@@ -904,29 +888,29 @@ Use \`/ticket ${ticket.id}\` for full details.`;
 
   formatSummaryMessage(summary) {
     const { period, stats } = summary;
-    
+
     let message = `📊 **Daily Ticket Summary** (${period})\n\n`;
     message += `**Total Tickets:** ${stats.total}\n\n`;
-    
+
     if (stats.total > 0) {
-      message += `**By Status:**\n`;
+      message += '**By Status:**\n';
       Object.entries(stats.byState).forEach(([state, count]) => {
         const icon = {
-          'open': '🔴',
-          'pending': '🟡',
-          'resolved': '🟢',
-          'closed': '✅'
+          open: '🔴',
+          pending: '🟡',
+          resolved: '🟢',
+          closed: '✅'
         }[state] || '⚪';
         message += `${icon} ${state}: ${count}\n`;
       });
-      
-      message += `\n**By Priority:**\n`;
+
+      message += '\n**By Priority:**\n';
       Object.entries(stats.byPriority).forEach(([priority, count]) => {
         const icon = {
-          'low': '🔵',
-          'normal': '🟡',
-          'high': '🟠',
-          'urgent': '🔴'
+          low: '🔵',
+          normal: '🟡',
+          high: '🟠',
+          urgent: '🔴'
         }[priority] || '⚪';
         message += `${icon} ${priority}: ${count}\n`;
       });
@@ -942,11 +926,11 @@ Use \`/ticket ${ticket.id}\` for full details.`;
     const assignee = conversation.assignee?.name || 'Unassigned';
     const customer = conversation.contacts?.contacts?.[0]?.name || 'Unknown';
     const messageCount = conversation.conversation_message?.total_count || 0;
-    
+
     const stateIcon = {
-      'open': '🔴',
-      'closed': '✅',
-      'snoozed': '😴'
+      open: '🔴',
+      closed: '✅',
+      snoozed: '😴'
     }[state] || '⚪';
 
     return `💬 **Conversation Details**
@@ -969,7 +953,7 @@ Use \`/ticket ${ticket.id}\` for full details.`;
       .join(', ');
 
     let message = `💬 **Conversations List**${filterText ? ` (${filterText})` : ''}\n\n`;
-    
+
     if (conversations.length === 0) {
       message += '📭 No conversations found matching your criteria.';
       return message;
@@ -978,11 +962,11 @@ Use \`/ticket ${ticket.id}\` for full details.`;
     conversations.forEach((conversation, index) => {
       const state = conversation.state || 'unknown';
       const subject = conversation.subject || 'No subject';
-      
+
       const stateIcon = {
-        'open': '🔴',
-        'closed': '✅',
-        'snoozed': '😴'
+        open: '🔴',
+        closed: '✅',
+        snoozed: '😴'
       }[state] || '⚪';
 
       message += `${index + 1}. ${stateIcon} **${conversation.id}**\n`;
@@ -1000,17 +984,17 @@ Use \`/ticket ${ticket.id}\` for full details.`;
     const customAttrs = Object.entries(filters.customAttributes || {})
       .map(([key, value]) => `${key}:${value}`)
       .join(', ');
-    
+
     const ticketTypes = filters.ticketType?.types?.join(', ') || '';
     const categories = filters.ticketType?.categories?.join(', ') || '';
-    
-    let filterText = [];
+
+    const filterText = [];
     if (customAttrs) filterText.push(`Custom: ${customAttrs}`);
     if (ticketTypes) filterText.push(`Types: ${ticketTypes}`);
     if (categories) filterText.push(`Categories: ${categories}`);
-    
+
     let message = `🎫 **Custom Filtered Tickets**${filterText.length ? ` (${filterText.join(', ')})` : ''}\n\n`;
-    
+
     if (tickets.length === 0) {
       message += '📭 No tickets found matching your custom criteria.';
       return message;
@@ -1021,18 +1005,18 @@ Use \`/ticket ${ticket.id}\` for full details.`;
       const priority = ticket.ticket_attributes?.priority || 'unknown';
       const subject = ticket.ticket_attributes?.subject || 'No subject';
       const customData = ticket.custom_attributes || {};
-      
+
       const stateIcon = {
-        'open': '🔴',
-        'pending': '🟡',
-        'resolved': '🟢',
-        'closed': '✅'
+        open: '🔴',
+        pending: '🟡',
+        resolved: '🟢',
+        closed: '✅'
       }[state] || '⚪';
 
       message += `${index + 1}. ${stateIcon} **${ticket.id}**\n`;
       message += `   ${subject}\n`;
       message += `   Priority: ${priority} | State: ${state}\n`;
-      
+
       // Show matched custom attributes
       if (Object.keys(customData).length > 0) {
         const customDisplay = Object.entries(customData)
@@ -1041,7 +1025,7 @@ Use \`/ticket ${ticket.id}\` for full details.`;
           .join(', ');
         message += `   Custom: ${customDisplay}\n`;
       }
-      
+
       message += `   Updated: ${new Date(ticket.updated_at).toLocaleDateString()}\n\n`;
     });
 
@@ -1056,9 +1040,9 @@ Use \`/ticket ${ticket.id}\` for full details.`;
     if (filters.types) filterParts.push(`Types: ${filters.types.join(', ')}`);
     if (filters.categories) filterParts.push(`Categories: ${filters.categories.join(', ')}`);
     if (filters.sources) filterParts.push(`Sources: ${filters.sources.join(', ')}`);
-    
+
     let message = `🎫 **Type Filtered Tickets**${filterParts.length ? ` (${filterParts.join(', ')})` : ''}\n\n`;
-    
+
     if (tickets.length === 0) {
       message += '📭 No tickets found matching your type criteria.';
       return message;
@@ -1071,12 +1055,12 @@ Use \`/ticket ${ticket.id}\` for full details.`;
       const type = ticket.ticket_attributes?.type || ticket.type || 'unknown';
       const category = ticket.ticket_attributes?.category || ticket.category || 'unknown';
       const source = ticket.source?.type || 'unknown';
-      
+
       const stateIcon = {
-        'open': '🔴',
-        'pending': '🟡',
-        'resolved': '🟢',
-        'closed': '✅'
+        open: '🔴',
+        pending: '🟡',
+        resolved: '🟢',
+        closed: '✅'
       }[state] || '⚪';
 
       message += `${index + 1}. ${stateIcon} **${ticket.id}**\n`;
@@ -1094,9 +1078,9 @@ Use \`/ticket ${ticket.id}\` for full details.`;
    */
   formatAdvancedTicketsMessage(tickets, filterConfig) {
     const filterSummary = this.summarizeFilterConfig(filterConfig);
-    
+
     let message = `🎫 **Advanced Filtered Tickets**${filterSummary ? ` (${filterSummary})` : ''}\n\n`;
-    
+
     if (tickets.length === 0) {
       message += '📭 No tickets found matching your advanced criteria.';
       return message;
@@ -1106,12 +1090,12 @@ Use \`/ticket ${ticket.id}\` for full details.`;
       const state = ticket.ticket_attributes?.state || 'unknown';
       const priority = ticket.ticket_attributes?.priority || 'unknown';
       const subject = ticket.ticket_attributes?.subject || 'No subject';
-      
+
       const stateIcon = {
-        'open': '🔴',
-        'pending': '🟡',
-        'resolved': '🟢',
-        'closed': '✅'
+        open: '🔴',
+        pending: '🟡',
+        resolved: '🟢',
+        closed: '✅'
       }[state] || '⚪';
 
       message += `${index + 1}. ${stateIcon} **${ticket.id}**\n`;
@@ -1153,7 +1137,7 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
    */
   summarizeFilterConfig(config) {
     const parts = [];
-    
+
     Object.entries(config).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         if (Array.isArray(value)) {
@@ -1168,26 +1152,26 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
         parts.push(`${key}: ${value}`);
       }
     });
-    
+
     return parts.join(' | ');
   }
 
   async generateTicketStats(period) {
     try {
       const tickets = await intercomService.getTickets({ page: 1, perPage: 100 });
-      
+
       // Filter by period (simplified)
       let filteredTickets = tickets.tickets;
       const now = new Date();
-      
+
       if (period === 'week') {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        filteredTickets = tickets.tickets.filter(ticket => 
+        filteredTickets = tickets.tickets.filter((ticket) =>
           new Date(ticket.created_at) >= weekAgo
         );
       } else if (period === 'month') {
         const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        filteredTickets = tickets.tickets.filter(ticket => 
+        filteredTickets = tickets.tickets.filter((ticket) =>
           new Date(ticket.created_at) >= monthAgo
         );
       }
@@ -1203,7 +1187,7 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
         resolvedTickets: 0
       };
 
-      filteredTickets.forEach(ticket => {
+      filteredTickets.forEach((ticket) => {
         const state = ticket.ticket_attributes?.state || 'unknown';
         const priority = ticket.ticket_attributes?.priority || 'unknown';
         const assignee = ticket.assignee?.name || 'Unassigned';
@@ -1220,7 +1204,6 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
       });
 
       return stats;
-
     } catch (error) {
       logger.error('❌ Failed to generate ticket stats', { error: error.message });
       throw error;
@@ -1229,37 +1212,37 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
 
   formatStatsMessage(stats) {
     const { period, total } = stats;
-    
+
     let message = `📊 **Ticket Statistics** (${period})\n\n`;
     message += `**Total Tickets:** ${total}\n`;
     message += `**Open:** ${stats.openTickets} | **Resolved:** ${stats.resolvedTickets}\n\n`;
-    
+
     if (total > 0) {
-      message += `**By Status:**\n`;
+      message += '**By Status:**\n';
       Object.entries(stats.byState).forEach(([state, count]) => {
         const icon = {
-          'open': '🔴',
-          'pending': '🟡',
-          'resolved': '🟢',
-          'closed': '✅'
+          open: '🔴',
+          pending: '🟡',
+          resolved: '🟢',
+          closed: '✅'
         }[state] || '⚪';
         message += `${icon} ${state}: ${count}\n`;
       });
-      
-      message += `\n**By Priority:**\n`;
+
+      message += '\n**By Priority:**\n';
       Object.entries(stats.byPriority).forEach(([priority, count]) => {
         const icon = {
-          'low': '🔵',
-          'normal': '🟡',
-          'high': '🟠',
-          'urgent': '🔴'
+          low: '🔵',
+          normal: '🟡',
+          high: '🟠',
+          urgent: '🔴'
         }[priority] || '⚪';
         message += `${icon} ${priority}: ${count}\n`;
       });
 
-      message += `\n**Top Assignees:**\n`;
+      message += '\n**Top Assignees:**\n';
       Object.entries(stats.byAssignee)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5)
         .forEach(([assignee, count]) => {
           message += `👤 ${assignee}: ${count}\n`;
@@ -1270,17 +1253,17 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
   }
 
   formatHelpMessage() {
-    let message = `🤖 **Ticket Bot Commands**\n\n`;
-    
+    let message = '🤖 **Ticket Bot Commands**\n\n';
+
     this.commands.forEach((command, name) => {
       message += `**${name}** - ${command.description}\n`;
       message += `   Usage: ${command.usage}\n\n`;
     });
 
-    message += `💡 **Tips:**\n`;
-    message += `• Use filters like state=open, priority=high\n`;
-    message += `• Subscribe to get automatic updates\n`;
-    message += `• Use /ticket <id> for detailed information`;
+    message += '💡 **Tips:**\n';
+    message += '• Use filters like state=open, priority=high\n';
+    message += '• Subscribe to get automatic updates\n';
+    message += '• Use /ticket <id> for detailed information';
 
     return message;
   }
@@ -1309,7 +1292,7 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
    * Send help message
    */
   async sendHelpMessage(chatId) {
-    const message = `👋 **Welcome to Ticket Bot!**\n\nI can help you with ticket information and status updates.\n\nUse /help to see all available commands.`;
+    const message = '👋 **Welcome to Ticket Bot!**\n\nI can help you with ticket information and status updates.\n\nUse /help to see all available commands.';
     return await this.sendMessage(chatId, message);
   }
 
@@ -1324,10 +1307,10 @@ Use \`/help\` for basic commands or contact support for complex filtering needs.
   formatTicketUpdateMessage(ticket, updateType) {
     const state = ticket.ticket_attributes?.state || 'unknown';
     const stateIcon = {
-      'open': '🔴',
-      'pending': '🟡',
-      'resolved': '🟢',
-      'closed': '✅'
+      open: '🔴',
+      pending: '🟡',
+      resolved: '🟢',
+      closed: '✅'
     }[state] || '⚪';
 
     return `🔔 **Ticket Update**
@@ -1362,4 +1345,4 @@ Use \`/ticket ${ticket.id}\` for full details.`;
 // Create singleton instance
 const chatbotService = new ChatbotService();
 
-module.exports = chatbotService; 
+module.exports = chatbotService;

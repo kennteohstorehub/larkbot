@@ -40,9 +40,9 @@ class MockIntercomService {
    */
   async getConversations(options = {}) {
     const { page = 1, perPage = 50 } = options;
-    
+
     logger.info('🎭 Mock: Getting conversations', { page, perPage });
-    
+
     // Generate mock conversations
     const conversations = Array.from({ length: Math.min(perPage, 25) }, (_, i) => ({
       id: `mock_conv_${page}_${i + 1}`,
@@ -103,7 +103,7 @@ class MockIntercomService {
    */
   async getConversation(conversationId) {
     logger.info('🎭 Mock: Getting conversation', { conversationId });
-    
+
     const conversations = await this.getConversations({ perPage: 1 });
     return {
       ...conversations.conversations[0],
@@ -116,9 +116,9 @@ class MockIntercomService {
    */
   async getTickets(options = {}) {
     const { page = 1, perPage = 50 } = options;
-    
+
     logger.info('🎭 Mock: Getting tickets', { page, perPage });
-    
+
     const tickets = Array.from({ length: Math.min(perPage, 20) }, (_, i) => ({
       id: `mock_ticket_${page}_${i + 1}`,
       type: 'ticket',
@@ -177,9 +177,9 @@ class MockIntercomService {
    */
   async getContacts(options = {}) {
     const { page = 1, perPage = 50 } = options;
-    
+
     logger.info('🎭 Mock: Getting contacts', { page, perPage });
-    
+
     const contacts = Array.from({ length: Math.min(perPage, 30) }, (_, i) => ({
       id: `mock_contact_${page}_${i + 1}`,
       type: 'contact',
@@ -222,17 +222,17 @@ class MockIntercomService {
    */
   async getAllConversations(options = {}) {
     const { limit = 1000, onProgress } = options;
-    
+
     logger.info('🎭 Mock: Getting all conversations', { limit });
-    
+
     const allConversations = [];
     let page = 1;
     const perPage = 50;
-    
+
     while (allConversations.length < limit) {
       const result = await this.getConversations({ page, perPage });
       allConversations.push(...result.conversations);
-      
+
       if (onProgress) {
         onProgress({
           current: allConversations.length,
@@ -240,14 +240,14 @@ class MockIntercomService {
           page
         });
       }
-      
+
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       if (!result.hasMore || allConversations.length >= limit) break;
       page++;
     }
-    
+
     return allConversations.slice(0, limit);
   }
 
@@ -280,4 +280,4 @@ class MockIntercomService {
 // Create singleton instance
 const mockIntercomService = new MockIntercomService();
 
-module.exports = mockIntercomService; 
+module.exports = mockIntercomService;
