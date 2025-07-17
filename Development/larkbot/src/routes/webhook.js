@@ -197,12 +197,23 @@ function extractTextFromPost(content) {
  */
 router.post('/intercom', async (req, res) => {
   try {
-    const { type, data } = req.body;
+    const { type, data, topic } = req.body;
 
-    logger.info('📧 Received Intercom webhook', { type, ticketId: data?.item?.id });
+    // Extract the actual event type from either type or topic field
+    const eventType = topic || type;
+    
+    logger.info('📧 Received Intercom webhook', { 
+      type, 
+      topic,
+      eventType,
+      ticketId: data?.item?.id || data?.conversation?.id,
+      dataKeys: Object.keys(data || {}),
+      hasItem: !!data?.item,
+      hasConversation: !!data?.conversation
+    });
 
     // Handle different Intercom event types
-    switch (type) {
+    switch (eventType) {
       case 'conversation.admin.assigned':
         await handleTicketAssigned(data);
         break;
@@ -228,6 +239,7 @@ router.post('/intercom', async (req, res) => {
         break;
 
       case 'conversation.admin.note.created':
+      case 'conversation.admin.noted':
         await handleTicketNoteAdded(data);
         break;
 
@@ -241,7 +253,13 @@ router.post('/intercom', async (req, res) => {
         break;
 
       default:
-        logger.info('Unhandled Intercom event type', { type, data: JSON.stringify(data, null, 2) });
+        logger.info('Unhandled Intercom event type', { 
+          type, 
+          topic,
+          eventType,
+          dataStructure: Object.keys(data || {}),
+          conversationId: data?.item?.id || data?.conversation?.id
+        });
     }
 
     res.json({ success: true });

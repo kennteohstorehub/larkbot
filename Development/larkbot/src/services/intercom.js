@@ -30,8 +30,9 @@ class IntercomService {
         tokenAuth: { token: config.intercom.token }
       });
 
-      // Test connection
-      await this.testConnection();
+      // Test connection - TEMPORARILY DISABLED for webhook testing
+      // await this.testConnection();
+      logger.info('⚠️  Intercom connection test skipped - webhook-only mode');
 
       this.isInitialized = true;
       logger.info('Intercom service initialized successfully');
