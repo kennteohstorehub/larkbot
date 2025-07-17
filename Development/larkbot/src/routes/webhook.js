@@ -437,39 +437,7 @@ function isL2OnsiteSupport(ticket) {
     // Check if ticket has the required custom attributes
     const customAttributes = ticket.custom_attributes || {};
 
-    // Method 1: Check team assignee ID for L2 Onsite Support Team
-    if (ticket.team_assignee_id === '5372074' || ticket.team_assignee_id === 5372074) {
-      logger.info('✅ L2 onsite ticket detected by team assignment', { ticketId: ticket.id });
-      return true;
-    }
-
-    // Method 2: Check ticket type
-    if (customAttributes.ticket_type === 'L2 Onsite Support') {
-      logger.info('✅ L2 onsite ticket detected by ticket type', { ticketId: ticket.id });
-      return true;
-    }
-
-    // Method 3: Check custom attribute for Tier 2 Support Type
-    const tier2SupportType = customAttributes['🔧Tier 2 Support Type'];
-    if (tier2SupportType && (
-      tier2SupportType.includes('Onsite Services') ||
-      tier2SupportType.toLowerCase().includes('onsite')
-    )) {
-      logger.info('✅ L2 onsite ticket detected by support type', { ticketId: ticket.id });
-      return true;
-    }
-    
-    // Method 3b: Check Ticket category for L2 Onsite
-    const ticketCategory = customAttributes['Ticket category'];
-    if (ticketCategory && (
-      ticketCategory === 'L2 Onsite Support' ||
-      ticketCategory.toLowerCase().includes('l2 onsite')
-    )) {
-      logger.info('✅ L2 onsite ticket detected by ticket category', { ticketId: ticket.id });
-      return true;
-    }
-
-    // Method 4: Check for site inspection requests (only New or Existing Merchant)
+    // ONLY check for site inspection requests - ignore all other criteria
     const onsiteRequestType = customAttributes['Onsite Request Type'];
     const validOnsiteTypes = [
       '👥 Site Inspection - New Merchant',
@@ -477,42 +445,22 @@ function isL2OnsiteSupport(ticket) {
     ];
     
     if (onsiteRequestType && validOnsiteTypes.includes(onsiteRequestType)) {
-      logger.info('✅ L2 onsite ticket detected by onsite request type', { 
+      logger.info('✅ L2 onsite ticket detected by site inspection request type', { 
         ticketId: ticket.id,
         onsiteRequestType 
       });
       return true;
     }
 
-    // Method 5: Check for keywords in title/body
-    const conversationParts = ticket.conversation_parts?.conversation_parts || [];
-    const firstPart = conversationParts[0];
-    if (firstPart?.body) {
-      const bodyText = firstPart.body.toLowerCase();
-      if (bodyText.includes('site inspection') || bodyText.includes('onsite support') || bodyText.includes('l2 onsite')) {
-        logger.info('✅ L2 onsite ticket detected by keywords in body', { ticketId: ticket.id });
-        return true;
-      }
-    }
+    // No other detection methods - only site inspection requests are captured
 
-    logger.info('❌ Not an L2 onsite support ticket', {
+    logger.info('❌ Not a site inspection ticket', {
       ticketId: ticket.id,
-      teamAssigneeId: ticket.team_assignee_id,
-      targetTeamId: '5372074',
-      ticketType: customAttributes.ticket_type,
-      ticketCategory,
-      tier2SupportType,
+      ticketType: customAttributes['Ticket type'],
       onsiteRequestType,
-      allCustomAttributes: Object.keys(customAttributes),
-      hasConversationParts: !!ticket.conversation_parts,
-      checkResults: {
-        teamMatch: ticket.team_assignee_id === '5372074' || ticket.team_assignee_id === 5372074,
-        ticketTypeMatch: customAttributes.ticket_type === 'L2 Onsite Support',
-        ticketCategoryMatch: ticketCategory === 'L2 Onsite Support',
-        tier2Match: tier2SupportType && tier2SupportType.toLowerCase().includes('onsite'),
-        onsiteMatch: validOnsiteTypes.includes(onsiteRequestType),
-        onsiteRequestValue: onsiteRequestType
-      }
+      reason: 'Only capturing Site Inspection tickets',
+      validTypes: validOnsiteTypes,
+      allCustomAttributes: Object.keys(customAttributes)
     });
 
     return false;
