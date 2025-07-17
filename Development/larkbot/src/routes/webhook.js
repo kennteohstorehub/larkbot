@@ -200,7 +200,8 @@ router.post('/intercom', async (req, res) => {
     const { type, data, topic } = req.body;
 
     // Extract the actual event type from either type or topic field
-    const eventType = topic || type;
+    // When type is "notification_event", use the topic field instead
+    const eventType = type === 'notification_event' ? topic : (topic || type);
     
     logger.info('📧 Received Intercom webhook', { 
       type, 
@@ -211,6 +212,16 @@ router.post('/intercom', async (req, res) => {
       hasItem: !!data?.item,
       hasConversation: !!data?.conversation
     });
+
+    // Log if this is being processed as L2 onsite
+    const conversationId = data?.item?.id || data?.conversation?.id;
+    if (conversationId && type === 'notification_event' && topic) {
+      logger.info('Processing L2 onsite webhook', { 
+        conversationId,
+        topic,
+        type
+      });
+    }
 
     // Handle different Intercom event types
     switch (eventType) {
