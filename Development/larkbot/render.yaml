@@ -2,28 +2,28 @@ services:
   - type: web
     name: larkbot-production
     env: node
+    # Explicitly set root directory to current directory (where package.json is)
     rootDir: .
-    buildCommand: npm ci
+    buildCommand: npm install
     startCommand: npm start
     plan: starter
     
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
+      # PORT is automatically set by Render, don't override it
       - key: LOG_LEVEL
         value: info
       - key: ENABLE_WEBHOOKS
-        value: true
+        value: "true"
       - key: ENABLE_CHATBOT
-        value: true
+        value: "true"
       - key: ENABLE_MONITORING
-        value: true
+        value: "true"
       - key: ENABLE_RATE_LIMITING
-        value: true
+        value: "true"
       - key: DEBUG_MODE
-        value: false
+        value: "false"
         
     # These should be set as secret environment variables in Render dashboard
     # - INTERCOM_TOKEN
@@ -45,28 +45,16 @@ services:
     autoDeploy: true
     branch: main
     
-    # Runtime settings
-    runtime: nodejs18
+    # Runtime settings - use Node.js version from package.json
+    # runtime: nodejs18
     
     # Scaling settings
     numInstances: 1
-    
-    # Resource limits
-    disk: 512MB
-    
-    # Build settings
-    buildFilter:
-      paths:
-        - src/**
-        - package.json
-        - package-lock.json
-        - Dockerfile
-        - ecosystem.config.js
         
     # Pre-deploy commands
-    preDeployCommand: |
-      npm ci --only=production
+    # preDeployCommand: |
+    #   npm ci --only=production
       
-    # Post-deploy commands  
-    postDeployCommand: |
-      echo "Larkbot deployment completed successfully"
+    # Post-deploy commands are optional
+    # postDeployCommand: |
+    #   echo "Larkbot deployment completed successfully"
