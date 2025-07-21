@@ -833,8 +833,8 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
           .replace(/&#39;/g, "'")
           .trim();
         
-        if (bodyText.length > 1000) {
-          bodyText = `${bodyText.substring(0, 1000)}...`;
+        if (bodyText.length > 2000) {
+          bodyText = `${bodyText.substring(0, 2000)}...`;
         }
       }
 
