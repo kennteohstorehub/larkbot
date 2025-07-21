@@ -63,7 +63,7 @@ The **Intercom-Lark Automation System** is a comprehensive solution that automat
   - All other L2 tickets (hardware troubleshooting, etc.) are ignored
 - **Enhanced Message Display**: 
   - Card format supports up to 1000 characters
-  - Text format supports up to 1500 characters
+  - Text format supports up to 2000 characters
 - **Multi-Group Support**: Can send to multiple Lark chat groups simultaneously
 
 #### Phase 4: Enhanced Lark Integration 🔄 **60% COMPLETE**

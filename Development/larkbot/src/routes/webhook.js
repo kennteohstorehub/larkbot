@@ -1042,8 +1042,8 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
             .trim();
 
           // Increased character limit to show full context
-          if (bodyText.length > 1500) {
-            bodyText = `${bodyText.substring(0, 1500)}...`;
+          if (bodyText.length > 2000) {
+            bodyText = `${bodyText.substring(0, 2000)}...`;
           }
 
           message += `${bodyText}\n`;

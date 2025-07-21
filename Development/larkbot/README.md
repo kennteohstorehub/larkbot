@@ -21,7 +21,7 @@ A comprehensive automation system that extracts, processes, and transfers data f
 ### **✅ Phase 3: Real-time Automation**
 - **Intercom Webhook Integration**: Automatic ticket status change detection
 - **Lark Bot Notifications**: Real-time updates sent to chat groups with interactive cards
-- **Site Inspection Focus**: Only captures "👥 Site Inspection" tickets (New/Existing Merchant)
+- **Site Inspection Focus**: Only captures "👥 Site Inspection" tickets (New/Existing Merchant) sent to "Complex Setup Process" group
 - **Status Flow Tracking**: `submitted → in progress → resolved → closed`
 - **Complete Activity Logging**: All notes, comments, and updates included
 - **Multi-event Support**: Assignments, replies, notes, closures

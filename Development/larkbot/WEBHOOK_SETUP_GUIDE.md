@@ -149,7 +149,7 @@ Perfect! 🎉 Your bot is now in a group. Let's get that chat group ID!
 Add a placeholder chat ID for now:
 
 ```bash
-<code_block_to_apply_changes_from>
+LARK_CHAT_GROUP_ID=oc_placeholder_for_now
 ```
 
 ### **Step 2: Set Up ngrok (for webhook testing)**

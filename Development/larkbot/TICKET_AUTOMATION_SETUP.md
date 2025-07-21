@@ -155,7 +155,7 @@ All other L2 tickets (hardware troubleshooting, technical support, etc.) are aut
 
 #### **Message Character Limits**
 - **Card format**: Up to 1000 characters per conversation part
-- **Text format**: Up to 1500 characters per conversation part
+- **Text format**: Up to 2000 characters per conversation part
 - Messages exceeding these limits are truncated with "..." indicator
 
 ## 🔧 **Step 5: Customization Options**
