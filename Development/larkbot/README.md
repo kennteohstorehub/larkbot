@@ -18,15 +18,16 @@ A comprehensive automation system that extracts, processes, and transfers data f
 - **Data Transformation**: Automated processing and enrichment
 - **Performance Optimization**: Efficient pagination and caching
 
-### **✅ Phase 3: Real-time Automation**
+### **✅ Phase 3: Real-time Automation** 🚀 **LIVE IN PRODUCTION**
 - **Intercom Webhook Integration**: Automatic ticket status change detection
 - **Lark Bot Notifications**: Real-time updates sent to chat groups with interactive cards
 - **Site Inspection Focus**: Only captures "👥 Site Inspection" tickets (New/Existing Merchant) sent to "Complex Setup Process" group
 - **Status Flow Tracking**: `submitted → in progress → resolved → closed`
-- **Complete Activity Logging**: All notes, comments, and updates included
+- **Complete Activity Logging**: All notes, comments, and updates included (up to 2000 characters)
 - **Multi-event Support**: Assignments, replies, notes, closures
 - **Event Queuing System**: Reliable processing with retry mechanisms
 - **Beautiful Card Format**: Color-coded headers for different event types
+- **Production URL**: https://l2-onsite-monitor.onrender.com
 
 ### **🔄 Phase 4: Lark Integration** 
 - **Lark Suite API**: Full bot and messaging capabilities
