@@ -220,6 +220,25 @@ function extractTextFromPost(content) {
  * Verify Intercom webhook signature
  */
 function verifyIntercomSignature(req, res, next) {
+  // Temporary bypass for signature verification
+  if (process.env.SKIP_INTERCOM_SIGNATURE_CHECK === 'true') {
+    logger.warn('⚠️  SECURITY WARNING: Intercom signature verification is BYPASSED!');
+    logger.warn('This is temporary - find your webhook secret and remove SKIP_INTERCOM_SIGNATURE_CHECK');
+    
+    // If body is a Buffer, parse it for the route handler
+    if (Buffer.isBuffer(req.body)) {
+      try {
+        const rawBody = req.body.toString('utf8');
+        req.body = JSON.parse(rawBody);
+      } catch (error) {
+        logger.error('Failed to parse webhook body', { error: error.message });
+        return res.status(400).json({ error: 'Invalid JSON body' });
+      }
+    }
+    
+    return next();
+  }
+
   // Intercom sends the header as 'X-Hub-Signature' (capital letters)
   // Express lowercases all headers, so we check for lowercase version
   const signature = req.headers['x-hub-signature'];
