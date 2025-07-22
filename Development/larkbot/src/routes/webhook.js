@@ -220,12 +220,16 @@ function extractTextFromPost(content) {
  * Verify Intercom webhook signature
  */
 function verifyIntercomSignature(req, res, next) {
+  // Intercom sends the header as 'X-Hub-Signature' (capital letters)
+  // Express lowercases all headers, so we check for lowercase version
   const signature = req.headers['x-hub-signature'];
   
   if (!signature) {
     logger.warn('Missing Intercom webhook signature header', {
       path: req.path,
-      headers: Object.keys(req.headers)
+      headers: Object.keys(req.headers),
+      lookingFor: 'x-hub-signature',
+      receivedHeaders: req.headers
     });
     return res.status(401).json({ error: 'Missing signature header' });
   }
@@ -243,21 +247,43 @@ function verifyIntercomSignature(req, res, next) {
     return res.status(500).json({ error: 'Webhook verification not configured' });
   }
 
+  // Get the raw body for signature verification
+  // If we have a Buffer (from express.raw()), use it directly
+  // Otherwise, stringify the parsed body (less reliable)
+  const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : JSON.stringify(req.body);
+
   // Intercom uses SHA1 with 'sha1=' prefix
   const expectedSignature = 'sha1=' + crypto
     .createHmac('sha1', webhookSecret)
-    .update(JSON.stringify(req.body))
+    .update(rawBody)
     .digest('hex');
 
   if (signature !== expectedSignature) {
     logger.warn('❌ Invalid Intercom webhook signature', {
       receivedSignature: signature,
-      path: req.path
+      expectedSignature: expectedSignature,
+      path: req.path,
+      isBuffer: Buffer.isBuffer(req.body),
+      bodyType: typeof req.body,
+      bodyLength: rawBody.length,
+      secretConfigured: !!webhookSecret,
+      secretLength: webhookSecret.length
     });
     return res.status(401).json({ error: 'Invalid signature' });
   }
 
   logger.debug('✅ Intercom webhook signature verified successfully');
+  
+  // If body is a Buffer, parse it for the route handler
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      req.body = JSON.parse(rawBody);
+    } catch (error) {
+      logger.error('Failed to parse webhook body', { error: error.message });
+      return res.status(400).json({ error: 'Invalid JSON body' });
+    }
+  }
+  
   next();
 }
 
