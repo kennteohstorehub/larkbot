@@ -437,6 +437,17 @@ function isL2OnsiteSupport(ticket) {
     // Check if ticket has the required custom attributes
     const customAttributes = ticket.custom_attributes || {};
 
+    // Check country - only process Malaysia tickets
+    const country = customAttributes['🌎 Country'];
+    if (!country || !country.toLowerCase().includes('malaysia')) {
+      logger.info('❌ Not a Malaysia ticket', {
+        ticketId: ticket.id,
+        country,
+        reason: 'Only processing Malaysia tickets'
+      });
+      return false;
+    }
+
     // ONLY check for site inspection requests - ignore all other criteria
     const onsiteRequestType = customAttributes['Onsite Request Type'];
     const validOnsiteTypes = [
@@ -447,7 +458,8 @@ function isL2OnsiteSupport(ticket) {
     if (onsiteRequestType && validOnsiteTypes.includes(onsiteRequestType)) {
       logger.info('✅ L2 onsite ticket detected by site inspection request type', { 
         ticketId: ticket.id,
-        onsiteRequestType 
+        onsiteRequestType,
+        country 
       });
       return true;
     }
@@ -458,6 +470,7 @@ function isL2OnsiteSupport(ticket) {
       ticketId: ticket.id,
       ticketType: customAttributes['Ticket type'],
       onsiteRequestType,
+      country,
       reason: 'Only capturing Site Inspection tickets',
       validTypes: validOnsiteTypes,
       allCustomAttributes: Object.keys(customAttributes)
