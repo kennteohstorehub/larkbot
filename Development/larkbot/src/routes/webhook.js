@@ -19,18 +19,43 @@ function verifySignature(req, res, next) {
   const nonce = req.headers['x-lark-request-nonce'];
 
   if (!signature || !timestamp || !nonce) {
+    logger.warn('Missing required webhook headers', {
+      hasSignature: !!signature,
+      hasTimestamp: !!timestamp,
+      hasNonce: !!nonce,
+      path: req.path
+    });
     return res.status(401).json({ error: 'Missing required headers' });
   }
 
-  // In production, verify the signature using your webhook secret
-  // const expectedSignature = crypto.createHmac('sha256', process.env.LARK_WEBHOOK_SECRET)
-  //   .update(timestamp + nonce + JSON.stringify(req.body))
-  //   .digest('hex');
+  // Skip verification in development mode for easier testing
+  if (process.env.NODE_ENV === 'development' && process.env.SKIP_WEBHOOK_VERIFICATION === 'true') {
+    logger.warn('⚠️ Webhook signature verification skipped in development mode');
+    return next();
+  }
 
-  // if (signature !== expectedSignature) {
-  //   return res.status(401).json({ error: 'Invalid signature' });
-  // }
+  // Verify the signature using webhook secret
+  const webhookSecret = process.env.LARK_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    logger.error('❌ LARK_WEBHOOK_SECRET not configured - webhook verification disabled');
+    return res.status(500).json({ error: 'Webhook verification not configured' });
+  }
 
+  const expectedSignature = crypto.createHmac('sha256', webhookSecret)
+    .update(timestamp + nonce + JSON.stringify(req.body))
+    .digest('hex');
+
+  if (signature !== expectedSignature) {
+    logger.warn('❌ Invalid webhook signature', {
+      receivedSignature: signature,
+      path: req.path,
+      timestamp,
+      nonce
+    });
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+
+  logger.debug('✅ Webhook signature verified successfully');
   next();
 }
 
@@ -192,6 +217,51 @@ function extractTextFromPost(content) {
 }
 
 /**
+ * Verify Intercom webhook signature
+ */
+function verifyIntercomSignature(req, res, next) {
+  const signature = req.headers['x-hub-signature'];
+  
+  if (!signature) {
+    logger.warn('Missing Intercom webhook signature header', {
+      path: req.path,
+      headers: Object.keys(req.headers)
+    });
+    return res.status(401).json({ error: 'Missing signature header' });
+  }
+
+  // Skip verification in development mode for easier testing
+  if (process.env.NODE_ENV === 'development' && process.env.SKIP_WEBHOOK_VERIFICATION === 'true') {
+    logger.warn('⚠️ Intercom webhook signature verification skipped in development mode');
+    return next();
+  }
+
+  // Verify the signature using webhook secret
+  const webhookSecret = process.env.INTERCOM_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    logger.error('❌ INTERCOM_WEBHOOK_SECRET not configured - webhook verification disabled');
+    return res.status(500).json({ error: 'Webhook verification not configured' });
+  }
+
+  // Intercom uses SHA1 with 'sha1=' prefix
+  const expectedSignature = 'sha1=' + crypto
+    .createHmac('sha1', webhookSecret)
+    .update(JSON.stringify(req.body))
+    .digest('hex');
+
+  if (signature !== expectedSignature) {
+    logger.warn('❌ Invalid Intercom webhook signature', {
+      receivedSignature: signature,
+      path: req.path
+    });
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+
+  logger.debug('✅ Intercom webhook signature verified successfully');
+  next();
+}
+
+/**
  * Handle Intercom webhook events
  * This is what processes ticket status changes from Intercom
  */
@@ -203,7 +273,7 @@ router.get('/intercom/version', (req, res) => {
   });
 });
 
-router.post('/intercom', async (req, res) => {
+router.post('/intercom', verifyIntercomSignature, async (req, res) => {
   try {
     const { type, data, topic } = req.body;
 
