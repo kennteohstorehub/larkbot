@@ -1,4 +1,4 @@
-const { Client } = require('intercom-client');
+const { IntercomClient } = require('intercom-client');
 const config = require('../config');
 const logger = require('../utils/logger');
 
@@ -26,16 +26,7 @@ class IntercomService {
         throw new Error('Intercom token is required');
       }
 
-      // Debug import issue on Render
-      const intercomModule = require('intercom-client');
-      logger.info('Intercom module keys:', Object.keys(intercomModule));
-      const ClientConstructor = intercomModule.Client || intercomModule;
-      
-      if (typeof ClientConstructor !== 'function') {
-        throw new Error(`Client is not a constructor. Type: ${typeof ClientConstructor}`);
-      }
-
-      this.client = new ClientConstructor({
+      this.client = new IntercomClient({
         tokenAuth: { token: config.intercom.token }
       });
 
