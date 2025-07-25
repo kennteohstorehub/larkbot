@@ -1,9 +1,9 @@
 # Product Requirements Document (PRD)
 ## Intercom-Lark Suite Automation System
 
-**Version:** 1.0  
-**Date:** January 2025  
-**Status:** Phase 1 Development  
+**Version:** 2.0  
+**Date:** July 2025  
+**Status:** Production - Live on Render  
 
 ---
 
@@ -79,4 +79,33 @@ The **Intercom-Lark Automation System** is a comprehensive solution that automat
 #### Phase 6: Complete Automation 📅 **PLANNED**
 - **As a** Business Owner, **I want to** end-to-end automated pipeline **so that** the system runs without manual intervention
 - **As a** System Admin, **I want to** comprehensive monitoring **so that** I can ensure system reliability
-- **As a** Support Team, **I want to** seamless workflow **so that** we can focus on customers instead of tools 
+- **As a** Support Team, **I want to** seamless workflow **so that** we can focus on customers instead of tools
+
+## 4. Production Deployment
+
+### 4.1 Current Production Status
+- **Platform**: Render.com
+- **Service Name**: L2 Onsite Monitor
+- **URL**: https://l2-onsite-monitor.onrender.com
+- **Status**: ✅ Live and operational
+- **Environment**: Production
+- **Phase**: 4 (Full automation with Lark integration)
+
+### 4.2 Key Features in Production
+- **Real-time Webhook Integration**: Receives Intercom events instantly
+- **L2 Onsite Filtering**: Only processes tickets assigned to L2 Onsite team (ID: 5372074)
+- **Lark Notifications**: Sends formatted messages to configured Lark groups
+- **Signature Verification**: Secure webhook with HMAC signature validation
+- **Auto-deployment**: Continuous deployment from main branch
+
+### 4.3 Configuration
+- **Intercom Integration**: Token-based authentication with API access
+- **Lark Integration**: App ID and secret configured for bot messaging
+- **Webhook Events**: Monitoring conversation assignments, notes, and status changes
+- **Target Groups**: Multiple Lark chat groups for different teams
+
+### 4.4 Monitoring
+- **Health Check**: `/health` endpoint for service monitoring
+- **Uptime Monitoring**: Render's built-in monitoring
+- **Error Logging**: Comprehensive logging for debugging
+- **Rate Limiting**: Automatic handling of API rate limits 

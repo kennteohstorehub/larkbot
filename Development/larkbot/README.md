@@ -2,6 +2,13 @@
 
 A comprehensive automation system that extracts, processes, and transfers data from Intercom to Lark Suite with intelligent chatbot-driven access and management capabilities.
 
+## 🚀 Production Status
+
+**Live URL**: https://l2-onsite-monitor.onrender.com  
+**Status**: ✅ Operational in Production  
+**Platform**: Render.com  
+**Version**: 2.0 (July 2025)
+
 ## 🎯 **Key Features**
 
 ### **✅ Phase 1: Data Extraction & Export**
@@ -83,23 +90,29 @@ Status Changes → Event Processing → Formatting → Notifications
 - ✅ **Integrated data** - tickets stored in your Base
 - ✅ **Team collaboration** - everyone can see and edit
 
-### **Option 2: Webhook Server (Advanced)**
-Perfect for teams wanting real-time webhook processing:
+### **Option 2: Webhook Server (Production Ready)**
+**Currently deployed and operational on Render.com**
 
 ```bash
+# Production URL: https://l2-onsite-monitor.onrender.com
+
+# For local development:
 # 1. Clone and install
-git clone <repository>
-cd intercom-lark-automation
+git clone https://github.com/kennteohstorehub/larkbot.git
+cd larkbot
 npm install
 
-# 2. Quick setup for ticket automation
-npm run setup:lark
+# 2. Configure environment variables
+cp .env.example .env
+# Edit .env with your credentials
 
-# 3. Follow the setup guide
-# See TICKET_AUTOMATION_SETUP.md for detailed instructions
+# 3. Start local development
+npm run dev
 
-# 4. Start the application
-npm start
+# Production deployment:
+# - Auto-deploys from main branch to Render
+# - Webhook configured in Intercom
+# - L2 Onsite tickets automatically sent to Lark
 ```
 
 ### **Option 3: Data Export Only**
