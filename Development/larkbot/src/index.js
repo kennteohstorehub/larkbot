@@ -62,6 +62,10 @@ class Application {
       credentials: true
     }));
 
+    // CRITICAL: Raw body parsing for webhook signature verification
+    // This MUST come before the global JSON parsing middleware
+    this.app.use('/webhook/intercom', express.raw({ type: 'application/json', limit: '10mb' }));
+
     // Body parsing
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));

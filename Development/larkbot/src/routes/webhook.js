@@ -286,7 +286,13 @@ function verifyIntercomSignature(req, res, next) {
       bodyType: typeof req.body,
       bodyLength: rawBody.length,
       secretConfigured: !!webhookSecret,
-      secretLength: webhookSecret.length
+      secretLength: webhookSecret.length,
+      // Add first 100 chars of body for debugging (be careful not to log sensitive data)
+      bodyPreview: rawBody.substring(0, 100) + '...',
+      headers: {
+        'content-type': req.headers['content-type'],
+        'x-hub-signature': req.headers['x-hub-signature']
+      }
     });
     return res.status(401).json({ error: 'Invalid signature' });
   }
