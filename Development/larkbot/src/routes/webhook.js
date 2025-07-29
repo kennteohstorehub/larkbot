@@ -623,9 +623,13 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
     // Debug logging to see custom attributes from webhook
     logger.info('🔍 Custom attributes from webhook:', {
       ticketId: ticket.id,
+      hasCustomAttributes: !!ticket.custom_attributes,
+      customAttributesType: typeof ticket.custom_attributes,
       customAttributes: ticket.custom_attributes,
       merchantAccountName: ticket.custom_attributes?.['🆔 Merchant Account Name'],
-      allAttributeKeys: ticket.custom_attributes ? Object.keys(ticket.custom_attributes) : []
+      allAttributeKeys: ticket.custom_attributes ? Object.keys(ticket.custom_attributes) : [],
+      // Log the entire ticket object to see structure
+      ticketStructure: Object.keys(ticket)
     });
 
     // ENHANCED: Always try to fetch full conversation data from Intercom API
@@ -680,7 +684,11 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
             ...fullConversation,
             // Keep webhook-specific metadata
             team_assignee_id: ticket.team_assignee_id || fullConversation.team_assignee_id,
-            custom_attributes: ticket.custom_attributes || fullConversation.custom_attributes
+            // Merge custom attributes from both sources, preferring webhook data
+            custom_attributes: {
+              ...fullConversation.custom_attributes,
+              ...ticket.custom_attributes
+            }
           };
           logger.info('✅ Successfully fetched and merged conversation data from Intercom API', {
             ticketId: ticket.id,
@@ -693,7 +701,9 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
           // Debug logging to see custom attributes after API enrichment
           logger.info('🔍 Custom attributes after API enrichment:', {
             ticketId: enrichedTicket.id,
-            customAttributes: enrichedTicket.custom_attributes,
+            webhookCustomAttrs: ticket.custom_attributes,
+            apiCustomAttrs: fullConversation.custom_attributes,
+            mergedCustomAttrs: enrichedTicket.custom_attributes,
             merchantAccountName: enrichedTicket.custom_attributes?.['🆔 Merchant Account Name'],
             allAttributeKeys: enrichedTicket.custom_attributes ? Object.keys(enrichedTicket.custom_attributes) : []
           });
