@@ -224,7 +224,7 @@ function verifyIntercomSignature(req, res, next) {
   if (process.env.SKIP_INTERCOM_SIGNATURE_CHECK === 'true') {
     logger.warn('⚠️  SECURITY WARNING: Intercom signature verification is BYPASSED!');
     logger.warn('This is temporary - find your webhook secret and remove SKIP_INTERCOM_SIGNATURE_CHECK');
-    
+
     // If body is a Buffer, parse it for the route handler
     if (Buffer.isBuffer(req.body)) {
       try {
@@ -235,14 +235,14 @@ function verifyIntercomSignature(req, res, next) {
         return res.status(400).json({ error: 'Invalid JSON body' });
       }
     }
-    
+
     return next();
   }
 
   // Intercom sends the header as 'X-Hub-Signature' (capital letters)
   // Express lowercases all headers, so we check for lowercase version
   const signature = req.headers['x-hub-signature'];
-  
+
   if (!signature) {
     logger.warn('Missing Intercom webhook signature header', {
       path: req.path,
@@ -272,15 +272,12 @@ function verifyIntercomSignature(req, res, next) {
   const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : JSON.stringify(req.body);
 
   // Intercom uses SHA1 with 'sha1=' prefix
-  const expectedSignature = 'sha1=' + crypto
-    .createHmac('sha1', webhookSecret)
-    .update(rawBody)
-    .digest('hex');
+  const expectedSignature = `sha1=${crypto.createHmac('sha1', webhookSecret).update(rawBody).digest('hex')}`;
 
   if (signature !== expectedSignature) {
     logger.warn('❌ Invalid Intercom webhook signature', {
       receivedSignature: signature,
-      expectedSignature: expectedSignature,
+      expectedSignature,
       path: req.path,
       isBuffer: Buffer.isBuffer(req.body),
       bodyType: typeof req.body,
@@ -288,7 +285,7 @@ function verifyIntercomSignature(req, res, next) {
       secretConfigured: !!webhookSecret,
       secretLength: webhookSecret.length,
       // Add first 100 chars of body for debugging (be careful not to log sensitive data)
-      bodyPreview: rawBody.substring(0, 100) + '...',
+      bodyPreview: `${rawBody.substring(0, 100)}...`,
       headers: {
         'content-type': req.headers['content-type'],
         'x-hub-signature': req.headers['x-hub-signature']
@@ -298,7 +295,7 @@ function verifyIntercomSignature(req, res, next) {
   }
 
   logger.debug('✅ Intercom webhook signature verified successfully');
-  
+
   // If body is a Buffer, parse it for the route handler
   if (Buffer.isBuffer(req.body)) {
     try {
@@ -308,7 +305,7 @@ function verifyIntercomSignature(req, res, next) {
       return res.status(400).json({ error: 'Invalid JSON body' });
     }
   }
-  
+
   next();
 }
 
@@ -317,7 +314,7 @@ function verifyIntercomSignature(req, res, next) {
  * This is what processes ticket status changes from Intercom
  */
 router.get('/intercom/version', (req, res) => {
-  res.json({ 
+  res.json({
     version: '2025-07-17-v3',
     message: 'Webhook handler with all fixes applied',
     timestamp: new Date().toISOString()
@@ -331,10 +328,10 @@ router.post('/intercom', verifyIntercomSignature, async (req, res) => {
     // Extract the actual event type from either type or topic field
     // When type is "notification_event", use the topic field instead
     const eventType = type === 'notification_event' ? topic : (topic || type);
-    
+
     // DETAILED WEBHOOK PAYLOAD LOGGING
-    logger.info('📧 Received Intercom webhook', { 
-      type, 
+    logger.info('📧 Received Intercom webhook', {
+      type,
       topic,
       eventType,
       ticketId: data?.item?.id || data?.conversation?.id,
@@ -346,7 +343,7 @@ router.post('/intercom', verifyIntercomSignature, async (req, res) => {
     // Log if this is being processed as L2 onsite
     const conversationId = data?.item?.id || data?.conversation?.id;
     if (conversationId && type === 'notification_event' && topic) {
-      logger.info('Processing L2 onsite webhook', { 
+      logger.info('Processing L2 onsite webhook', {
         conversationId,
         topic,
         type
@@ -394,8 +391,8 @@ router.post('/intercom', verifyIntercomSignature, async (req, res) => {
         break;
 
       default:
-        logger.info('Unhandled Intercom event type', { 
-          type, 
+        logger.info('Unhandled Intercom event type', {
+          type,
           topic,
           eventType,
           dataStructure: Object.keys(data || {}),
@@ -575,12 +572,12 @@ function isL2OnsiteSupport(ticket) {
       '👥 Site Inspection - New Merchant',
       '👥 Site Inspection - Existing Merchant'
     ];
-    
+
     if (onsiteRequestType && validOnsiteTypes.includes(onsiteRequestType)) {
-      logger.info('✅ L2 onsite ticket detected by site inspection request type', { 
+      logger.info('✅ L2 onsite ticket detected by site inspection request type', {
         ticketId: ticket.id,
         onsiteRequestType,
-        country 
+        country
       });
       return true;
     }
@@ -623,20 +620,28 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
       return;
     }
 
+    // Debug logging to see custom attributes from webhook
+    logger.info('🔍 Custom attributes from webhook:', {
+      ticketId: ticket.id,
+      customAttributes: ticket.custom_attributes,
+      merchantAccountName: ticket.custom_attributes?.['🆔 Merchant Account Name'],
+      allAttributeKeys: ticket.custom_attributes ? Object.keys(ticket.custom_attributes) : []
+    });
+
     // ENHANCED: Always try to fetch full conversation data from Intercom API
     // Webhook payloads often don't include all conversation parts
     let enrichedTicket = ticket;
     logger.info('🔄 Fetching full conversation data from Intercom API', {
       ticketId: ticket.id,
       eventType,
-      hasConversationPartsInWebhook: !!(ticket.conversation_parts && ticket.conversation_parts.conversation_parts && ticket.conversation_parts.conversation_parts.length > 0)
+      hasConversationPartsInWebhook: !!(ticket.conversation_parts?.conversation_parts?.length > 0)
     });
 
     try {
       // Try to fetch full conversation data from Intercom
       const { intercomService } = require('../services');
       const healthStatus = intercomService?.getHealthStatus?.() || {};
-      
+
       logger.info('📡 Intercom service status - DETAILED', {
         ticketId: ticket.id,
         serviceExists: !!intercomService,
@@ -655,9 +660,9 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
           ticketId: ticket.id,
           apiEndpoint: `/conversations/${ticket.id}`
         });
-        
+
         const fullConversation = await intercomService.getConversation(ticket.id);
-        
+
         logger.info('📥 Intercom API response received', {
           ticketId: ticket.id,
           hasResponse: !!fullConversation,
@@ -667,11 +672,11 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
           // Log the full response structure for debugging
           apiResponse: fullConversation ? JSON.stringify(fullConversation, null, 2) : 'null'
         });
-        
+
         if (fullConversation) {
           // Merge webhook data with API data, preferring API data for conversation_parts
-          enrichedTicket = { 
-            ...ticket, 
+          enrichedTicket = {
+            ...ticket,
             ...fullConversation,
             // Keep webhook-specific metadata
             team_assignee_id: ticket.team_assignee_id || fullConversation.team_assignee_id,
@@ -683,6 +688,14 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
             hasCustomAttributes: !!enrichedTicket.custom_attributes,
             teamAssigneeId: enrichedTicket.team_assignee_id,
             mergedTicketKeys: Object.keys(enrichedTicket)
+          });
+
+          // Debug logging to see custom attributes after API enrichment
+          logger.info('🔍 Custom attributes after API enrichment:', {
+            ticketId: enrichedTicket.id,
+            customAttributes: enrichedTicket.custom_attributes,
+            merchantAccountName: enrichedTicket.custom_attributes?.['🆔 Merchant Account Name'],
+            allAttributeKeys: enrichedTicket.custom_attributes ? Object.keys(enrichedTicket.custom_attributes) : []
           });
         } else {
           logger.warn('⚠️ Intercom API returned empty conversation data', {
@@ -710,13 +723,16 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
       { name: 'MY/PH FE', id: process.env.LARK_CHAT_GROUP_ID_MYPHFE },
       { name: 'Complex Setup Process', id: process.env.LARK_CHAT_GROUP_ID_COMPLEX_SETUP }
     ];
-    
-    const chatGroups = allGroups.filter((group) => group.id && group.id !== 'oc_placeholder_for_now' && group.id !== 'oc_myphfe_group_id' && group.id !== 'oc_complex_setup_group_id');
-    
+
+    const chatGroups = allGroups.filter((group) => {
+      return group.id && group.id !== 'oc_placeholder_for_now'
+        && group.id !== 'oc_myphfe_group_id' && group.id !== 'oc_complex_setup_group_id';
+    });
+
     logger.info('🎯 Lark chat group configuration', {
       ticketId: enrichedTicket.id,
-      allGroups: allGroups.map(g => ({ name: g.name, id: g.id, isPlaceholder: g.id === 'oc_placeholder_for_now' })),
-      filteredGroups: chatGroups.map(g => ({ name: g.name, id: g.id })),
+      allGroups: allGroups.map((g) => ({ name: g.name, id: g.id, isPlaceholder: g.id === 'oc_placeholder_for_now' })),
+      filteredGroups: chatGroups.map((g) => ({ name: g.name, id: g.id })),
       filteredCount: chatGroups.length,
       environmentVariables: {
         LARK_CHAT_GROUP_ID_MYPHFE: process.env.LARK_CHAT_GROUP_ID_MYPHFE,
@@ -751,7 +767,7 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
 
     // Format the message as an interactive card for L2 onsite tickets
     const cardContent = formatTicketAsCard(enrichedTicket, eventType, metadata);
-    
+
     logger.info('📝 Formatted Lark card', {
       ticketId: enrichedTicket.id,
       eventType,
@@ -882,7 +898,15 @@ function formatTicketUpdateMessage(ticket, eventType, metadata = {}) {
  */
 function formatTicketAsCard(ticket, eventType, metadata = {}) {
   const customAttrs = ticket.custom_attributes || {};
-  
+
+  // Debug log custom attributes when formatting
+  logger.info('🎨 Formatting ticket card with custom attributes:', {
+    ticketId: ticket.id,
+    merchantAccountName: customAttrs['🆔 Merchant Account Name'],
+    hasCustomAttrs: !!ticket.custom_attributes,
+    customAttrKeys: Object.keys(customAttrs)
+  });
+
   // Get event type emoji and title
   const eventConfigs = {
     opened: { emoji: '🆕', title: 'NEW SITE INSPECTION REQUEST', template: 'blue' },
@@ -893,10 +917,10 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
     reopened: { emoji: '🔄', title: 'SITE INSPECTION REOPENED', template: 'orange' }
   };
 
-  const config = eventConfigs[eventType] || { 
-    emoji: '📋', 
-    title: 'SITE INSPECTION UPDATE', 
-    template: 'blue' 
+  const config = eventConfigs[eventType] || {
+    emoji: '📋',
+    title: 'SITE INSPECTION UPDATE',
+    template: 'blue'
   };
 
   // Create card elements
@@ -908,16 +932,17 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
     closed: '🔴',
     snoozed: '🟡'
   };
-  
+
   const expressRequest = customAttrs['Express Request - 3 hours Onsite Request'];
   const isExpress = expressRequest && expressRequest.toLowerCase() === 'yes';
-  
+
   // Merchant details with state and express status integrated
   elements.push({
     tag: 'div',
     text: {
       tag: 'lark_md',
-      content: `${stateColors[ticket.state] || '⚪'} **State:** ${ticket.state || 'open'} | ${isExpress ? '⚡ EXPRESS (3 HOURS)' : '⏱️ STANDARD REQUEST'}
+      content: `${stateColors[ticket.state] || '⚪'} **State:** ${ticket.state || 'open'} | `
+        + `${isExpress ? '⚡ EXPRESS (3 HOURS)' : '⏱️ STANDARD REQUEST'}
 
 **Merchant Details:**
 • **Name:** ${customAttrs['🆔 Merchant Account Name'] || 'Unknown'}
@@ -942,20 +967,21 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
   }
 
   // Conversation and notes section
-  if (ticket.conversation_parts && ticket.conversation_parts.conversation_parts && ticket.conversation_parts.conversation_parts.length > 0) {
+  const hasConversationParts = ticket.conversation_parts?.conversation_parts?.length > 0;
+  if (hasConversationParts) {
     elements.push({
       tag: 'hr'
     });
-    
+
     const parts = ticket.conversation_parts.conversation_parts;
     const sortedParts = [...parts].sort((a, b) => a.created_at - b.created_at);
     const recentParts = sortedParts.slice(-5); // Show last 5 for card format
 
-    const conversationContent = recentParts.map(part => {
+    const conversationContent = recentParts.map((part) => {
       const author = part.author?.name || part.author?.email || 'Unknown';
       const timestamp = new Date(part.created_at * 1000).toLocaleString();
       let bodyText = '';
-      
+
       if (part.body) {
         bodyText = part.body
           .replace(/<[^>]*>/g, '')
@@ -966,7 +992,7 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
           .replace(/&quot;/g, '"')
           .replace(/&#39;/g, "'")
           .trim();
-        
+
         if (bodyText.length > 2000) {
           bodyText = `${bodyText.substring(0, 2000)}...`;
         }
@@ -1000,21 +1026,21 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
   });
 
   const footerElements = [];
-  
+
   if (metadata.assignee) {
     footerElements.push({
       tag: 'plain_text',
       content: `👤 Assigned to: ${metadata.assignee}`
     });
   }
-  
+
   if (metadata.repliedBy) {
     footerElements.push({
       tag: 'plain_text',
       content: `💬 Replied by: ${metadata.repliedBy}`
     });
   }
-  
+
   if (metadata.noteBy) {
     footerElements.push({
       tag: 'plain_text',
@@ -1139,7 +1165,7 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
 
       // Show conversation parts in chronological order (oldest first)
       const sortedParts = [...parts].sort((a, b) => a.created_at - b.created_at);
-      
+
       // Show most recent 10 parts to avoid message being too long
       const recentParts = sortedParts.slice(-10);
 
