@@ -734,14 +734,18 @@ async function sendTicketUpdateToLark(ticket, eventType, metadata = {}) {
       { name: 'Complex Setup Process', id: process.env.LARK_CHAT_GROUP_ID_COMPLEX_SETUP }
     ];
 
-    const chatGroups = allGroups.filter((group) => {
-      return group.id && group.id !== 'oc_placeholder_for_now'
-        && group.id !== 'oc_myphfe_group_id' && group.id !== 'oc_complex_setup_group_id';
-    });
+    const chatGroups = allGroups.filter((group) => group.id 
+      && group.id !== 'oc_placeholder_for_now'
+      && group.id !== 'oc_myphfe_group_id' 
+      && group.id !== 'oc_complex_setup_group_id');
 
     logger.info('🎯 Lark chat group configuration', {
       ticketId: enrichedTicket.id,
-      allGroups: allGroups.map((g) => ({ name: g.name, id: g.id, isPlaceholder: g.id === 'oc_placeholder_for_now' })),
+      allGroups: allGroups.map((g) => ({ 
+        name: g.name, 
+        id: g.id, 
+        isPlaceholder: g.id === 'oc_placeholder_for_now' 
+      })),
       filteredGroups: chatGroups.map((g) => ({ name: g.name, id: g.id })),
       filteredCount: chatGroups.length,
       environmentVariables: {
@@ -904,6 +908,43 @@ function formatTicketUpdateMessage(ticket, eventType, metadata = {}) {
 }
 
 /**
+ * Extract merchant name from custom attributes with multiple fallbacks
+ * @param {Object} customAttrs - Custom attributes object
+ * @returns {string} Merchant name or 'Unknown'
+ */
+function extractMerchantName(customAttrs) {
+  // List of possible field names for merchant/account name
+  const possibleFields = [
+    '🆔 Merchant Account Name',
+    'Merchant Account Name',
+    'Account Name',
+    'Merchant Name',
+    'Business Name',
+    'Store Name',
+    'Company Name',
+    'Organization Name',
+    'Client Name',
+    'Customer Name'
+  ];
+
+  // Try each field until we find one with a value
+  for (const field of possibleFields) {
+    if (customAttrs[field]) {
+      logger.info('Found merchant name', { field, value: customAttrs[field] });
+      return customAttrs[field];
+    }
+  }
+
+  // Log all available custom attributes if merchant name not found
+  logger.warn('Merchant name not found in custom attributes', {
+    availableFields: Object.keys(customAttrs),
+    customAttrs
+  });
+
+  return 'Unknown';
+}
+
+/**
  * Format ticket message as interactive card
  */
 function formatTicketAsCard(ticket, eventType, metadata = {}) {
@@ -955,7 +996,7 @@ function formatTicketAsCard(ticket, eventType, metadata = {}) {
         + `${isExpress ? '⚡ EXPRESS (3 HOURS)' : '⏱️ STANDARD REQUEST'}
 
 **Merchant Details:**
-• **Name:** ${customAttrs['🆔 Merchant Account Name'] || 'Unknown'}
+• **Name:** ${extractMerchantName(customAttrs)}
 • **Country:** ${customAttrs['🌎 Country'] || 'Unknown'}
 • **Contact:** ${customAttrs['PIC Name'] || 'Unknown'} - ${customAttrs['PIC Contact Number'] || 'Unknown'}
 • **Address:** ${customAttrs['FULL Store Address'] || 'Unknown'}`
@@ -1148,7 +1189,7 @@ function formatL2OnsiteMessage(ticket, eventType, metadata = {}) {
     message += '**Express Request:** ⏱️ NO - STANDARD\n';
   }
 
-  message += `**Merchant:** ${customAttrs['🆔 Merchant Account Name'] || 'Unknown'}\n`;
+  message += `**Merchant:** ${extractMerchantName(customAttrs)}\n`;
   message += `**Country:** ${customAttrs['🌎 Country'] || 'Unknown'}\n`;
   message += `**PIC:** ${customAttrs['PIC Name'] || 'Unknown'}\n`;
   message += `**Contact:** ${customAttrs['PIC Contact Number'] || 'Unknown'}\n`;
